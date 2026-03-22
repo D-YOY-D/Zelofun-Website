@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zelofun™ - Terms of Service</title>
+    <meta name="description" content="Terms of Service for Zelofun™ - The social overlay layer for the web">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 100000;
+            border-radius: 0 0 4px 0;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        @media (prefers-contrast: high) {
+            * {
+                border-color: currentColor !important;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg,
+                rgba(0,212,255,0.05) 0%,
+                rgba(123,100,255,0.05) 25%,
+                rgba(255,107,157,0.05) 50%,
+                rgba(255,199,55,0.05) 75%,
+                rgba(0,212,255,0.05) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        *:focus {
+            outline: 3px solid #00D4FF;
+            outline-offset: 2px;
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 3px solid #00D4FF;
+            outline-offset: 2px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #e0e0e0;
+        }
+
+        .emoji-logo {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            font-weight: 300;
+        }
+
+        .last-updated {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 12px;
+            border-radius: 12px;
+            margin-left: 8px;
+            vertical-align: middle;
+            letter-spacing: 0.5px;
+        }
+
+        h2 {
+            color: #1a1a2e;
+            font-size: 28px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .section-emoji {
+            font-size: 32px;
+            display: inline-block;
+        }
+
+        p {
+            margin-bottom: 18px;
+            color: #333;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        ul, ol {
+            margin: 20px 0 20px 30px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            color: #333;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .highlight-box {
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 12px;
+        }
+
+        .highlight-box h3 {
+            color: #0d47a1;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .highlight-box p {
+            color: #1a237e;
+        }
+
+        .warning-box {
+            background: #ffebee;
+            border-left: 4px solid #d32f2f;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 12px;
+        }
+
+        .warning-box h3 {
+            color: #b71c1c;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .info-box {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .info-box h3 {
+            color: #e65100;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .legal-caps {
+            text-transform: uppercase;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        strong {
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        a {
+            color: #0066cc;
+            text-decoration: underline;
+        }
+
+        a:hover {
+            color: #0052a3;
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            color: #666;
+        }
+
+        .footer nav {
+            margin-top: 15px;
+        }
+
+        .footer a {
+            color: #0066cc;
+            text-decoration: underline;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+            padding: 5px;
+        }
+
+        .footer a:hover {
+            color: #0052a3;
+            transform: translateY(-2px);
+        }
+
+        .footer a:focus {
+            outline: 3px solid #00D4FF;
+            outline-offset: 2px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            .emoji-logo {
+                font-size: 48px;
+            }
+
+            .footer a {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="container">
+        <header>
+            <div class="header">
+                <span class="emoji-logo" role="img" aria-label="Terms">📜</span>
+                <h1>Terms of Service</h1>
+                <div class="subtitle">Zelofun™ &mdash; Terms of Service</div>
+                <div class="last-updated">
+                    <time datetime="2026-03">Last Updated: March 2026</time> &bull; Effective Date: March 2026 <span class="version-badge">v2.0</span>
+                </div>
+            </div>
+        </header>
+
+        <main id="main-content">
+            <div class="highlight-box">
+                <p>Welcome to Zelofun. These Terms of Service ("Terms") govern your use of the Zelofun browser extension, Progressive Web App (PWA), website, and all related services (collectively, the "Service") operated by Zelofun ("we", "us", "our").</p>
+                <p><strong>By installing, accessing, or using the Service, you agree to be bound by these Terms. If you do not agree, do not use the Service.</strong></p>
+            </div>
+
+            <section aria-labelledby="about-service">
+                <h2 id="about-service"><span class="section-emoji" aria-hidden="true">🌐</span>1. About the Service</h2>
+                <p>Zelofun is a social overlay platform that enables users to:</p>
+                <ul>
+                    <li>Post comments, reactions, images, videos, and voice notes on top of any website</li>
+                    <li>Participate in community discussions independent of the underlying website</li>
+                    <li>View AI-generated analysis of community content (Trust Scores, Sentiment, Credibility)</li>
+                    <li>Create and join groups for shared discussions</li>
+                    <li>Follow other users and build a social network</li>
+                </ul>
+                <p>The Service operates as a Chrome browser extension and Progressive Web App. It creates a transparent social layer above existing websites without modifying or interfering with those websites.</p>
+            </section>
+
+            <section aria-labelledby="eligibility">
+                <h2 id="eligibility"><span class="section-emoji" aria-hidden="true">👤</span>2. Eligibility</h2>
+                <p>You must be at least <strong>13 years old</strong> to use the Service. If you are between 13 and 18 years old, you may only use the Service with the consent of a parent or legal guardian.</p>
+                <p>By using the Service, you represent and warrant that you meet these age requirements.</p>
+            </section>
+
+            <section aria-labelledby="account-registration">
+                <h2 id="account-registration"><span class="section-emoji" aria-hidden="true">🔐</span>3. Account Registration</h2>
+
+                <h3>3.1 Creating an Account</h3>
+                <p>To use most features of the Service, you must create an account. You can register using:</p>
+                <ul>
+                    <li><strong>Google Sign-In</strong> (OAuth 2.0)</li>
+                    <li><strong>Email and password</strong> registration</li>
+                </ul>
+
+                <h3>3.2 Account Responsibilities</h3>
+                <p>You are responsible for:</p>
+                <ul>
+                    <li>Maintaining the security of your account credentials</li>
+                    <li>All activity that occurs under your account</li>
+                    <li>Providing accurate profile information</li>
+                    <li>Notifying us promptly if you suspect unauthorized access to your account</li>
+                </ul>
+
+                <h3>3.3 One Account Per Person</h3>
+                <p>Each person may maintain only one active account. Creating multiple accounts to circumvent blocks, bans, or content restrictions is prohibited.</p>
+            </section>
+
+            <section aria-labelledby="user-content">
+                <h2 id="user-content"><span class="section-emoji" aria-hidden="true">✍️</span>4. User Content</h2>
+
+                <h3>4.1 Your Content</h3>
+                <p>"User Content" refers to any text, images, videos, voice notes, reactions, or other materials you post through the Service. You retain ownership of your User Content.</p>
+                <p>By posting User Content, you grant Zelofun a <strong>non-exclusive, worldwide, royalty-free license</strong> to:</p>
+                <ul>
+                    <li>Display your content to other users of the Service</li>
+                    <li>Store your content on our infrastructure</li>
+                    <li>Process your content for AI analysis features (Trust Scores, Sentiment, etc.)</li>
+                    <li>Cache and distribute your content for performance purposes</li>
+                </ul>
+                <p>This license exists solely to operate and provide the Service. We will not use your content for advertising or sell it to third parties.</p>
+
+                <h3>4.2 Content Visibility</h3>
+                <p>When you post content, you choose its visibility:</p>
+                <ul>
+                    <li><strong>Public</strong> &mdash; visible to all Zelofun users on that webpage</li>
+                    <li><strong>Private</strong> &mdash; visible only to you</li>
+                    <li><strong>Group</strong> &mdash; visible only to members of a specific group</li>
+                    <li><strong>Influencer</strong> &mdash; visible with enhanced display for verified influencer accounts</li>
+                </ul>
+                <p>You can change the visibility of your content or delete it at any time.</p>
+
+                <h3>4.3 Content Responsibility</h3>
+                <p>You are solely responsible for your User Content. You represent and warrant that:</p>
+                <ul>
+                    <li>You own or have the right to share any content you post</li>
+                    <li>Your content does not infringe any third party's intellectual property rights</li>
+                    <li>Your content complies with these Terms and our <a href="/community-guidelines.html">Community Guidelines</a></li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="prohibited-conduct">
+                <h2 id="prohibited-conduct"><span class="section-emoji" aria-hidden="true">🚫</span>5. Prohibited Conduct</h2>
+                <p>You agree not to use the Service to:</p>
+
+                <div class="warning-box">
+                    <h3>5.1 Harmful Content</h3>
+                    <ul>
+                        <li>Post content that promotes violence, hatred, or discrimination against any individual or group</li>
+                        <li>Share sexually explicit or pornographic material</li>
+                        <li>Post content that exploits or endangers minors in any way</li>
+                        <li>Share graphic violence or disturbing imagery</li>
+                        <li>Encourage self-harm or suicide</li>
+                    </ul>
+                </div>
+
+                <h3>5.2 Illegal Activity</h3>
+                <ul>
+                    <li>Violate any applicable local, national, or international law</li>
+                    <li>Share copyrighted material without authorization</li>
+                    <li>Distribute malware, viruses, or malicious code</li>
+                    <li>Engage in fraud, phishing, or identity theft</li>
+                    <li>Harass, stalk, or threaten other users</li>
+                </ul>
+
+                <h3>5.3 Platform Abuse</h3>
+                <ul>
+                    <li>Create fake or misleading accounts</li>
+                    <li>Impersonate other individuals or organizations</li>
+                    <li>Use automated tools to spam or flood the Service with content</li>
+                    <li>Attempt to bypass security measures, rate limits, or access controls</li>
+                    <li>Reverse engineer, decompile, or extract source code from the Service</li>
+                    <li>Interfere with the operation of the Service or its infrastructure</li>
+                    <li>Scrape or collect data about other users without their consent</li>
+                </ul>
+
+                <h3>5.4 Deception</h3>
+                <ul>
+                    <li>Post deliberately false or misleading information presented as fact</li>
+                    <li>Manipulate AI analysis features through coordinated inauthentic behavior</li>
+                    <li>Misrepresent your affiliation with any person or organization</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="ai-features">
+                <h2 id="ai-features"><span class="section-emoji" aria-hidden="true">🤖</span>6. AI Features and Automated Content</h2>
+
+                <h3>6.1 AI-Generated Content</h3>
+                <p>The Service includes automated AI personas that generate content based on publicly available news sources (RSS feeds). This content is:</p>
+                <ul>
+                    <li>Designed to stimulate community discussion</li>
+                    <li>Identifiable through profile markers indicating AI authorship</li>
+                    <li>Not endorsements of any viewpoint by Zelofun</li>
+                </ul>
+
+                <h3>6.2 AI Analysis</h3>
+                <p>AI-powered analysis features (Trust Score, Sentiment Analysis, Credibility Signals, Disagreement Mapping, Contributor Mix) are provided for informational purposes only. They:</p>
+                <ul>
+                    <li>Are generated by automated algorithms and may contain errors</li>
+                    <li>Should not be relied upon as the sole basis for any decision</li>
+                    <li>Do not represent editorial opinions of Zelofun</li>
+                    <li>Are continuously improved and may change over time</li>
+                </ul>
+
+                <div class="info-box">
+                    <h3>6.3 AI Limitations</h3>
+                    <p>We do not guarantee the accuracy, completeness, or reliability of any AI-generated content or analysis. AI features are provided "as is" and may produce unexpected or incorrect results.</p>
+                </div>
+            </section>
+
+            <section aria-labelledby="content-moderation">
+                <h2 id="content-moderation"><span class="section-emoji" aria-hidden="true">🛡️</span>7. Content Moderation</h2>
+
+                <h3>7.1 Reporting</h3>
+                <p>Any user may report content that violates these Terms or Community Guidelines using the built-in reporting feature.</p>
+
+                <h3>7.2 Review Process</h3>
+                <p>Reported content is reviewed by our moderation team. We may:</p>
+                <ul>
+                    <li>Remove content that violates these Terms</li>
+                    <li>Issue warnings to users who violate our guidelines</li>
+                    <li>Temporarily or permanently suspend accounts that repeatedly violate our guidelines</li>
+                    <li>Refer illegal content to appropriate authorities</li>
+                </ul>
+
+                <h3>7.3 Moderation Decisions</h3>
+                <p>We strive to be fair and transparent in our moderation. However, moderation decisions are made at our sole discretion. We are not obligated to provide detailed explanations for individual moderation actions.</p>
+
+                <h3>7.4 Appeals</h3>
+                <p>If you believe your content was removed in error or your account was wrongly suspended, you may contact us at <a href="mailto:support@zelofun.com">support@zelofun.com</a> to request a review.</p>
+            </section>
+
+            <section aria-labelledby="intellectual-property">
+                <h2 id="intellectual-property"><span class="section-emoji" aria-hidden="true">©️</span>8. Intellectual Property</h2>
+
+                <h3>8.1 Our Property</h3>
+                <p>The Service, including its design, code, features, branding, logo, and documentation, is owned by Zelofun and protected by intellectual property laws. "Zelofun" and the Zelofun logo are trademarks of Zelofun.</p>
+                <p>You may not:</p>
+                <ul>
+                    <li>Copy, modify, or distribute the Service's code or design</li>
+                    <li>Use our trademarks without prior written permission</li>
+                    <li>Create derivative works based on the Service</li>
+                </ul>
+
+                <h3>8.2 Your Property</h3>
+                <p>You retain all ownership rights to the User Content you create. These Terms do not transfer ownership of your content to us.</p>
+
+                <h3>8.3 Feedback</h3>
+                <p>If you provide suggestions, ideas, or feedback about the Service, we may use them without any obligation to compensate you.</p>
+            </section>
+
+            <section aria-labelledby="third-party-websites">
+                <h2 id="third-party-websites"><span class="section-emoji" aria-hidden="true">🔗</span>9. Third-Party Websites</h2>
+
+                <h3>9.1 Overlay Nature</h3>
+                <p>Zelofun operates as an overlay on third-party websites. We do not:</p>
+                <ul>
+                    <li>Control or endorse the content of any third-party website</li>
+                    <li>Modify, alter, or interfere with third-party websites</li>
+                    <li>Access data from third-party websites</li>
+                    <li>Represent or act on behalf of any third-party website</li>
+                </ul>
+
+                <h3>9.2 Website Owner Rights</h3>
+                <p>We respect the rights of website owners. If you are a website owner and have concerns about Zelofun content appearing on your site, please contact us at <a href="mailto:support@zelofun.com">support@zelofun.com</a>.</p>
+            </section>
+
+            <section aria-labelledby="privacy">
+                <h2 id="privacy"><span class="section-emoji" aria-hidden="true">🔒</span>10. Privacy</h2>
+                <p>Your use of the Service is also governed by our <a href="/privacy.html">Privacy Policy</a>. By using the Service, you acknowledge that you have read and understood our Privacy Policy.</p>
+            </section>
+
+            <section aria-labelledby="availability-changes">
+                <h2 id="availability-changes"><span class="section-emoji" aria-hidden="true">🔄</span>11. Availability and Changes</h2>
+
+                <h3>11.1 Service Availability</h3>
+                <p>We strive to provide reliable service but do not guarantee uninterrupted availability. The Service may be temporarily unavailable due to:</p>
+                <ul>
+                    <li>Maintenance and updates</li>
+                    <li>Technical issues</li>
+                    <li>Circumstances beyond our control</li>
+                </ul>
+
+                <h3>11.2 Changes to the Service</h3>
+                <p>We may modify, update, or discontinue features of the Service at any time. We will make reasonable efforts to notify users of significant changes through the extension or our website.</p>
+
+                <h3>11.3 Changes to These Terms</h3>
+                <p>We may update these Terms from time to time. When we make significant changes:</p>
+                <ul>
+                    <li>We will update the "Last Updated" date</li>
+                    <li>We will notify users through the Service</li>
+                    <li>Continued use after changes constitutes acceptance</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="termination">
+                <h2 id="termination"><span class="section-emoji" aria-hidden="true">⛔</span>12. Termination</h2>
+
+                <h3>12.1 By You</h3>
+                <p>You may stop using the Service at any time by:</p>
+                <ul>
+                    <li>Uninstalling the browser extension</li>
+                    <li>Deleting your account through the settings panel</li>
+                    <li>Contacting us at <a href="mailto:support@zelofun.com">support@zelofun.com</a></li>
+                </ul>
+
+                <h3>12.2 By Us</h3>
+                <p>We may suspend or terminate your account if:</p>
+                <ul>
+                    <li>You violate these Terms</li>
+                    <li>You engage in prohibited conduct</li>
+                    <li>Your account is used for illegal activity</li>
+                    <li>Continued provision of the Service to you becomes impractical</li>
+                </ul>
+
+                <h3>12.3 Effect of Termination</h3>
+                <p>Upon termination:</p>
+                <ul>
+                    <li>Your right to use the Service ends immediately</li>
+                    <li>We may delete your account data (subject to our data retention policy)</li>
+                    <li>Provisions that by their nature should survive termination will continue to apply (including intellectual property, limitation of liability, and dispute resolution)</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="disclaimers">
+                <h2 id="disclaimers"><span class="section-emoji" aria-hidden="true">⚠️</span>13. Disclaimers</h2>
+                <p class="legal-caps">THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+                <p class="legal-caps">WE DO NOT WARRANT THAT:</p>
+                <ul>
+                    <li>The Service will meet your specific requirements</li>
+                    <li>The Service will be uninterrupted, timely, secure, or error-free</li>
+                    <li>Results obtained from the Service (including AI analysis) will be accurate or reliable</li>
+                    <li>Any errors in the Service will be corrected</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="limitation-liability">
+                <h2 id="limitation-liability"><span class="section-emoji" aria-hidden="true">⚖️</span>14. Limitation of Liability</h2>
+                <p class="legal-caps">TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, ZELOFUN AND ITS OPERATORS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, USE, OR GOODWILL, ARISING OUT OF OR RELATED TO YOUR USE OF THE SERVICE.</p>
+                <p class="legal-caps">OUR TOTAL LIABILITY FOR ANY CLAIMS ARISING FROM OR RELATED TO THE SERVICE SHALL NOT EXCEED THE AMOUNT YOU HAVE PAID US IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR $100 USD, WHICHEVER IS GREATER.</p>
+                <p>Some jurisdictions do not allow the exclusion or limitation of certain damages. If these laws apply to you, some or all of the above limitations may not apply, and you may have additional rights.</p>
+            </section>
+
+            <section aria-labelledby="indemnification">
+                <h2 id="indemnification"><span class="section-emoji" aria-hidden="true">🛡️</span>15. Indemnification</h2>
+                <p>You agree to indemnify, defend, and hold harmless Zelofun and its operators from any claims, damages, losses, costs, or expenses (including reasonable legal fees) arising from:</p>
+                <ul>
+                    <li>Your use of the Service</li>
+                    <li>Your User Content</li>
+                    <li>Your violation of these Terms</li>
+                    <li>Your violation of any third party's rights</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="dispute-resolution">
+                <h2 id="dispute-resolution"><span class="section-emoji" aria-hidden="true">🏛️</span>16. Dispute Resolution</h2>
+
+                <h3>16.1 Governing Law</h3>
+                <p>These Terms are governed by the laws of the State of Israel, without regard to its conflict of law principles.</p>
+
+                <h3>16.2 Informal Resolution</h3>
+                <p>Before filing any formal legal action, you agree to contact us at <a href="mailto:legal@zelofun.com">legal@zelofun.com</a> and attempt to resolve the dispute informally for at least 30 days.</p>
+
+                <h3>16.3 Jurisdiction</h3>
+                <p>If informal resolution fails, any disputes shall be submitted to the exclusive jurisdiction of the courts located in Israel.</p>
+            </section>
+
+            <section aria-labelledby="general-provisions">
+                <h2 id="general-provisions"><span class="section-emoji" aria-hidden="true">📋</span>17. General Provisions</h2>
+
+                <h3>17.1 Entire Agreement</h3>
+                <p>These Terms, together with our <a href="/privacy.html">Privacy Policy</a>, constitute the entire agreement between you and Zelofun regarding the Service.</p>
+
+                <h3>17.2 Severability</h3>
+                <p>If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions will continue in full force and effect.</p>
+
+                <h3>17.3 Waiver</h3>
+                <p>Our failure to enforce any provision of these Terms does not constitute a waiver of that provision.</p>
+
+                <h3>17.4 Assignment</h3>
+                <p>You may not assign or transfer your rights under these Terms. We may assign our rights without restriction.</p>
+
+                <h3>17.5 Force Majeure</h3>
+                <p>We shall not be liable for any failure or delay in performance due to circumstances beyond our reasonable control, including natural disasters, war, terrorism, pandemics, government actions, or internet infrastructure failures.</p>
+            </section>
+
+            <section aria-labelledby="contact-us">
+                <h2 id="contact-us"><span class="section-emoji" aria-hidden="true">📧</span>18. Contact Us</h2>
+                <p>For questions about these Terms:</p>
+                <div class="highlight-box">
+                    <p><strong>Email:</strong> <a href="mailto:support@zelofun.com">support@zelofun.com</a></p>
+                    <p><strong>Legal inquiries:</strong> <a href="mailto:legal@zelofun.com">legal@zelofun.com</a></p>
+                    <p><strong>Website:</strong> <a href="https://zelofun.com">https://zelofun.com</a></p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer">
+                <p>&copy; 2024-2026 Zelofun™. All rights reserved.</p>
+                <nav aria-label="Footer navigation">
+                    <a href="/">Home</a>
+                    <a href="/privacy.html">Privacy Policy</a>
+                    <a href="/community-guidelines.html">Community Guidelines</a>
+                    <a href="/help.html">Help Center</a>
+                </nav>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

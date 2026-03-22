@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zelofun™ - Privacy Policy</title>
+    <meta name="description" content="Privacy Policy for Zelofun™ - How we collect, use, and protect your data">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 100000;
+            border-radius: 0 0 4px 0;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        @media (prefers-contrast: high) {
+            * {
+                border-color: currentColor !important;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.15;
+        }
+
+        *:focus {
+            outline: 3px solid #00D4FF;
+            outline-offset: 2px;
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 3px solid #00D4FF;
+            outline-offset: 2px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #e0e0e0;
+        }
+
+        .emoji-logo {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            font-weight: 300;
+        }
+
+        .last-updated {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        h2 {
+            color: #1a1a2e;
+            font-size: 28px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .section-emoji {
+            font-size: 32px;
+            display: inline-block;
+        }
+
+        p {
+            margin-bottom: 18px;
+            color: #333;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        ul {
+            margin: 20px 0 20px 30px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            color: #333;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .info-box {
+            background: #e8eaf6;
+            border-left: 4px solid #3f51b5;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 12px;
+        }
+
+        .info-box h3 {
+            color: #1a237e;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .info-box p {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .rights-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .rights-box h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 12px;
+        }
+
+        .warning-box h3 {
+            color: #e65100;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .do-not-box {
+            background: #ffebee;
+            border-left: 4px solid #d32f2f;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 12px;
+        }
+
+        .do-not-box h3 {
+            color: #b71c1c;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+
+        strong {
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        a {
+            color: #0066cc;
+            text-decoration: underline;
+        }
+
+        a:hover {
+            color: #0052a3;
+        }
+
+        .footer {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            color: #666;
+        }
+
+        .footer nav {
+            margin-top: 15px;
+        }
+
+        .footer a {
+            color: #0066cc;
+            text-decoration: underline;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+            padding: 5px;
+        }
+
+        .footer a:hover {
+            color: #0052a3;
+            transform: translateY(-2px);
+        }
+
+        .footer a:focus {
+            outline: 3px solid #00D4FF;
+            outline-offset: 2px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            .emoji-logo {
+                font-size: 48px;
+            }
+
+            .footer a {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="container">
+        <header>
+            <div class="header">
+                <span class="emoji-logo" role="img" aria-label="Privacy">🔒</span>
+                <h1>Privacy Policy</h1>
+                <div class="subtitle">Zelofun™ &mdash; Privacy Policy</div>
+                <div class="last-updated">
+                    <time datetime="2026-03">Last Updated: March 2026</time> &bull; Effective Date: March 2026
+                </div>
+            </div>
+        </header>
+
+        <main id="main-content">
+            <div class="info-box">
+                <p>Zelofun is operated by Zelofun ("we", "us", "our"). This Privacy Policy explains how we collect, use, store, and protect your information when you use the Zelofun browser extension, Progressive Web App (PWA), and related services (collectively, the "Service").</p>
+                <p><strong>We take your privacy seriously. We do not sell your personal data to third parties. We never have, and we never will.</strong></p>
+            </div>
+
+            <section aria-labelledby="what-is-zelofun">
+                <h2 id="what-is-zelofun"><span class="section-emoji" aria-hidden="true">🌐</span>1. What Is Zelofun?</h2>
+                <p>Zelofun is a social overlay platform that allows users to add comments, reactions, images, videos, and voice notes on top of any website on the internet. It operates as a Chrome browser extension and a Progressive Web App, creating a community layer that is independent of the websites being viewed.</p>
+                <p>The Service also includes AI-powered analysis features (such as Trust Scores, Sentiment Analysis, and Credibility Signals) and AI-generated content created by automated personas.</p>
+            </section>
+
+            <section aria-labelledby="info-we-collect">
+                <h2 id="info-we-collect"><span class="section-emoji" aria-hidden="true">📋</span>2. Information We Collect</h2>
+
+                <h3>2.1 Account Information</h3>
+                <p>When you create an account or sign in, we collect:</p>
+                <ul>
+                    <li><strong>Email address</strong> (via Google OAuth or email registration)</li>
+                    <li><strong>Display name</strong> (from your Google profile, or chosen by you)</li>
+                    <li><strong>Profile picture</strong> (from your Google profile, or uploaded by you)</li>
+                    <li><strong>Account type</strong> (standard user, influencer, or admin)</li>
+                </ul>
+
+                <h3>2.2 Content You Create</h3>
+                <p>When you use the Service, we collect the content you choose to share:</p>
+                <ul>
+                    <li><strong>Comments and text posts</strong> you create on websites</li>
+                    <li><strong>Reactions</strong> (likes, dislikes, emoji reactions) you add to content</li>
+                    <li><strong>Images, videos, and voice notes</strong> (up to 60 seconds) you upload</li>
+                    <li><strong>Replies and threaded discussions</strong> you participate in</li>
+                </ul>
+
+                <h3>2.3 Browsing Context</h3>
+                <p>To display your content on the correct webpage, we collect:</p>
+                <ul>
+                    <li><strong>Page URLs</strong> where you create or view content</li>
+                    <li><strong>Page titles</strong> of websites where content is posted</li>
+                    <li><strong>Timestamps</strong> of when content is created or viewed</li>
+                </ul>
+                <div class="info-box">
+                    <p>We do <strong>not</strong> track your general browsing history. We only record URLs where you actively choose to post content or interact with existing content.</p>
+                </div>
+
+                <h3>2.4 Usage Data</h3>
+                <p>We collect limited technical data to maintain and improve the Service:</p>
+                <ul>
+                    <li><strong>Device type and browser version</strong></li>
+                    <li><strong>Feature usage</strong> (which views and tools you use)</li>
+                    <li><strong>Error logs</strong> (to identify and fix bugs)</li>
+                    <li><strong>Session data</strong> (login times, session duration)</li>
+                </ul>
+
+                <h3>2.5 Groups and Social Connections</h3>
+                <p>If you use social features, we collect:</p>
+                <ul>
+                    <li><strong>Groups you create or join</strong></li>
+                    <li><strong>Users you follow or block</strong></li>
+                    <li><strong>Blacklist preferences</strong> (users whose content you hide)</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="how-we-use">
+                <h2 id="how-we-use"><span class="section-emoji" aria-hidden="true">⚙️</span>3. How We Use Your Information</h2>
+                <p>We use your information for the following purposes:</p>
+                <ul>
+                    <li><strong>Providing the Service</strong> &mdash; displaying your content on websites, showing reactions, enabling comments and discussions</li>
+                    <li><strong>Authentication</strong> &mdash; verifying your identity and managing your account</li>
+                    <li><strong>Content Moderation</strong> &mdash; reviewing reported content, enforcing community guidelines, and maintaining a safe environment</li>
+                    <li><strong>AI Analysis Features</strong> &mdash; generating Trust Scores, Sentiment Analysis, Credibility Signals, Disagreement Mapping, and Contributor Mix analysis based on aggregated community interactions</li>
+                    <li><strong>Notifications</strong> &mdash; alerting you about replies, reactions, and activity on your content</li>
+                    <li><strong>Service Improvement</strong> &mdash; understanding how features are used and identifying technical issues</li>
+                    <li><strong>Communication</strong> &mdash; sending important service updates (we do not send marketing emails)</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="ai-features">
+                <h2 id="ai-features"><span class="section-emoji" aria-hidden="true">🤖</span>4. AI Features and Automated Content</h2>
+
+                <h3>4.1 AI-Generated Content</h3>
+                <p>The Service includes AI personas &mdash; automated accounts that generate content based on publicly available RSS news feeds. This content is:</p>
+                <ul>
+                    <li>Clearly identifiable as AI-generated through user profile markers</li>
+                    <li>Created to stimulate community discussion and provide diverse perspectives</li>
+                    <li>Generated across multiple languages and regions (currently Israel, United Kingdom, and United States)</li>
+                </ul>
+
+                <h3>4.2 AI Analysis</h3>
+                <p>Our AI analysis features process publicly posted content to generate:</p>
+                <ul>
+                    <li><strong>Trust Scores</strong> &mdash; measuring community reliability of content</li>
+                    <li><strong>Sentiment Analysis</strong> &mdash; identifying emotional tone of discussions</li>
+                    <li><strong>Credibility Signals</strong> &mdash; assessing information quality</li>
+                    <li><strong>Disagreement Mapping</strong> &mdash; visualizing where communities diverge</li>
+                    <li><strong>Contributor Mix</strong> &mdash; showing diversity of participation</li>
+                </ul>
+                <p>These analyses are based on aggregated community data and are not used to profile individual users for advertising purposes.</p>
+            </section>
+
+            <section aria-labelledby="storage-security">
+                <h2 id="storage-security"><span class="section-emoji" aria-hidden="true">🛡️</span>5. How We Store and Protect Your Data</h2>
+
+                <h3>5.1 Infrastructure</h3>
+                <p>Your data is stored on <strong>Supabase</strong> cloud infrastructure, which uses:</p>
+                <ul>
+                    <li><strong>PostgreSQL</strong> databases with Row Level Security (RLS) policies</li>
+                    <li><strong>Encrypted connections</strong> (TLS/SSL) for all data in transit</li>
+                    <li><strong>Authenticated access</strong> &mdash; all database operations require valid JWT tokens verified through Supabase Auth</li>
+                    <li><strong>Media storage</strong> &mdash; images, videos, and voice notes stored in Supabase Storage with access controls</li>
+                </ul>
+
+                <h3>5.2 Authentication Security</h3>
+                <ul>
+                    <li>Sign-in is handled through <strong>Google OAuth 2.0</strong> via Supabase Authentication</li>
+                    <li>We never see or store your Google password</li>
+                    <li>Session tokens are automatically refreshed and expire after inactivity</li>
+                    <li>All write operations require authenticated sessions verified at the database level</li>
+                </ul>
+
+                <h3>5.3 Row Level Security</h3>
+                <p>Every database operation is protected by Row Level Security policies. This means:</p>
+                <ul>
+                    <li>Users can only edit or delete their own content</li>
+                    <li>Private content is only visible to its creator</li>
+                    <li>Group content is only visible to group members</li>
+                    <li>Admin actions are restricted to verified administrators</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="data-sharing">
+                <h2 id="data-sharing"><span class="section-emoji" aria-hidden="true">🤝</span>6. Data Sharing</h2>
+
+                <div class="do-not-box">
+                    <h3>6.1 We Do NOT</h3>
+                    <ul>
+                        <li>Sell your personal data to anyone</li>
+                        <li>Share your data with advertisers</li>
+                        <li>Use your data for targeted advertising</li>
+                        <li>Provide your data to data brokers</li>
+                        <li>Share your private content with other users</li>
+                    </ul>
+                </div>
+
+                <h3>6.2 We May Share Data When</h3>
+                <ul>
+                    <li><strong>You make it public</strong> &mdash; content you post as "public" is visible to all Zelofun users on that webpage</li>
+                    <li><strong>Legal requirements</strong> &mdash; if required by law, court order, or governmental authority</li>
+                    <li><strong>Service providers</strong> &mdash; with infrastructure providers (Supabase, Cloudflare) who process data on our behalf under strict data protection agreements</li>
+                    <li><strong>Safety</strong> &mdash; to protect against fraud, abuse, or threats to safety</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="your-rights">
+                <h2 id="your-rights"><span class="section-emoji" aria-hidden="true">✅</span>7. Your Rights and Choices</h2>
+
+                <div class="rights-box">
+                    <h3>7.1 All Users</h3>
+                    <p>You have the right to:</p>
+                    <ul>
+                        <li><strong>Access</strong> your data &mdash; view all content you have posted</li>
+                        <li><strong>Edit</strong> your content &mdash; modify your comments, reactions, and profile information</li>
+                        <li><strong>Delete</strong> your content &mdash; remove any content you have posted</li>
+                        <li><strong>Delete your account</strong> &mdash; request complete account deletion</li>
+                        <li><strong>Block users</strong> &mdash; hide content from specific users</li>
+                        <li><strong>Report content</strong> &mdash; flag content that violates community guidelines</li>
+                        <li><strong>Control visibility</strong> &mdash; choose whether your content is public, private, or limited to groups</li>
+                    </ul>
+                </div>
+
+                <h3>7.2 GDPR Rights (EU/UK Users)</h3>
+                <p>If you are located in the European Union or United Kingdom, you additionally have the right to:</p>
+                <ul>
+                    <li><strong>Data portability</strong> &mdash; receive your data in a structured, machine-readable format</li>
+                    <li><strong>Rectification</strong> &mdash; correct inaccurate personal data</li>
+                    <li><strong>Erasure</strong> ("Right to be Forgotten") &mdash; request deletion of your personal data</li>
+                    <li><strong>Restrict processing</strong> &mdash; limit how we use your data</li>
+                    <li><strong>Object to processing</strong> &mdash; object to certain uses of your data</li>
+                    <li><strong>Withdraw consent</strong> &mdash; withdraw any consent you have previously given</li>
+                </ul>
+                <p>To exercise any of these rights, contact us at <a href="mailto:privacy@zelofun.com">privacy@zelofun.com</a>.</p>
+
+                <h3>7.3 Account Deletion</h3>
+                <p>You may delete your account at any time. When you delete your account:</p>
+                <ul>
+                    <li>Your profile information is permanently removed</li>
+                    <li>Your content may be anonymized or deleted (depending on whether others have replied to it)</li>
+                    <li>Media files you uploaded are deleted from storage</li>
+                    <li>This process is irreversible</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="cookies">
+                <h2 id="cookies"><span class="section-emoji" aria-hidden="true">🍪</span>8. Cookies and Local Storage</h2>
+                <p>The Zelofun browser extension uses <strong>Chrome local storage</strong> (not cookies) to store:</p>
+                <ul>
+                    <li>Your authentication session</li>
+                    <li>Your display preferences (view mode, language, dark mode)</li>
+                    <li>Your blacklist preferences</li>
+                    <li>Cached data for performance</li>
+                </ul>
+                <p>The Zelofun website (zelofun.com) may use standard cookies for:</p>
+                <ul>
+                    <li>Analytics (anonymized usage statistics)</li>
+                    <li>Session management</li>
+                </ul>
+                <p>We do not use advertising cookies or third-party tracking cookies.</p>
+            </section>
+
+            <section aria-labelledby="childrens-privacy">
+                <h2 id="childrens-privacy"><span class="section-emoji" aria-hidden="true">👶</span>9. Children's Privacy</h2>
+                <p>The Service is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe your child has provided us with personal information, please contact us at <a href="mailto:privacy@zelofun.com">privacy@zelofun.com</a> and we will delete such information.</p>
+            </section>
+
+            <section aria-labelledby="data-retention">
+                <h2 id="data-retention"><span class="section-emoji" aria-hidden="true">🗄️</span>10. Data Retention</h2>
+                <ul>
+                    <li><strong>Active accounts</strong> &mdash; data is retained for as long as your account is active</li>
+                    <li><strong>Deleted accounts</strong> &mdash; personal data is deleted within 30 days of account deletion request</li>
+                    <li><strong>Content on active threads</strong> &mdash; may be anonymized rather than deleted if other users have replied</li>
+                    <li><strong>Error logs</strong> &mdash; retained for up to 90 days for debugging purposes</li>
+                    <li><strong>Aggregated analytics</strong> &mdash; may be retained indefinitely in anonymized form</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="international-transfers">
+                <h2 id="international-transfers"><span class="section-emoji" aria-hidden="true">🌍</span>11. International Data Transfers</h2>
+                <p>Our infrastructure providers may process data in locations outside your country of residence. When your data is transferred internationally, it is protected by:</p>
+                <ul>
+                    <li>Standard contractual clauses (for EU/UK transfers)</li>
+                    <li>Encryption in transit and at rest</li>
+                    <li>Data processing agreements with all service providers</li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="third-party-websites">
+                <h2 id="third-party-websites"><span class="section-emoji" aria-hidden="true">🔗</span>12. Third-Party Websites</h2>
+                <p>Zelofun operates as an overlay on third-party websites. We are not responsible for the privacy practices of the websites you visit while using our Service. Our overlay does not modify, access, or collect data from the underlying websites &mdash; it only displays and manages Zelofun community content.</p>
+            </section>
+
+            <section aria-labelledby="changes-policy">
+                <h2 id="changes-policy"><span class="section-emoji" aria-hidden="true">🔄</span>13. Changes to This Policy</h2>
+                <p>We may update this Privacy Policy from time to time. When we make significant changes, we will:</p>
+                <ul>
+                    <li>Update the "Last Updated" date at the top of this page</li>
+                    <li>Notify active users through the extension (for significant changes)</li>
+                    <li>Post a notice on zelofun.com</li>
+                </ul>
+                <p>Your continued use of the Service after changes are posted constitutes acceptance of the updated policy.</p>
+            </section>
+
+            <section aria-labelledby="contact-us">
+                <h2 id="contact-us"><span class="section-emoji" aria-hidden="true">📧</span>14. Contact Us</h2>
+                <p>For privacy-related inquiries, data access requests, or concerns:</p>
+                <div class="info-box">
+                    <p><strong>Email:</strong> <a href="mailto:privacy@zelofun.com">privacy@zelofun.com</a></p>
+                    <p><strong>Website:</strong> <a href="https://zelofun.com">https://zelofun.com</a></p>
+                </div>
+                <p>For GDPR-related requests, please include "GDPR Request" in your email subject line. We will respond within 30 days.</p>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer">
+                <p>&copy; 2024-2026 Zelofun™. All rights reserved.</p>
+                <nav aria-label="Footer navigation">
+                    <a href="/">Home</a>
+                    <a href="/terms.html">Terms of Service</a>
+                    <a href="/community-guidelines.html">Community Guidelines</a>
+                    <a href="/help.html">Help Center</a>
+                </nav>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
