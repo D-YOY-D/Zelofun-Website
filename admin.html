@@ -518,7 +518,7 @@ async function loadReports() {
   const filter = document.getElementById('report-filter').value;
   const search = document.getElementById('report-search').value.trim();
 
-  let query = adminDb.from('reports').select('*').order('created_at', { ascending: false }).limit(50);
+  let query = adminDb.from('reports').select('*, cellophanes(text)').order('created_at', { ascending: false }).limit(50);
 
   if (filter !== 'all') query = query.eq('status', filter);
   if (search) query = query.or(`cellophane_id.eq.${search},reporter_name.ilike.%${search}%`);
@@ -533,7 +533,7 @@ async function loadReports() {
 
   tbody.innerHTML = data.map(r => `
     <tr>
-      <td class="text-preview">${escHtml(r.cellophane_id || '—')}</td>
+      <td class="text-preview">${escHtml(r.cellophanes?.text?.slice(0, 80) || r.cellophane_id || '—')}</td>
       <td>${escHtml(r.reason || '—')}</td>
       <td>${escHtml(r.reporter_name || 'Anonymous')}</td>
       <td>1</td>
@@ -576,7 +576,7 @@ async function loadFlags() {
   const typeFilter = document.getElementById('flag-filter-type').value;
   const statusFilter = document.getElementById('flag-filter-status').value;
 
-  let query = adminDb.from('content_flags').select('*').order('created_at', { ascending: false }).limit(50);
+  let query = adminDb.from('content_flags').select('*, cellophanes(text)').order('created_at', { ascending: false }).limit(50);
 
   if (typeFilter !== 'all') query = query.eq('flag_type', typeFilter);
   if (statusFilter !== 'all') query = query.eq('status', statusFilter);
@@ -593,7 +593,7 @@ async function loadFlags() {
     const details = f.details || {};
     return `
       <tr>
-        <td class="text-preview">${escHtml(f.cellophane_id)}</td>
+        <td class="text-preview">${escHtml(f.cellophanes?.text?.slice(0, 80) || f.cellophane_id)}</td>
         <td><span class="flag-tag">${escHtml(f.flag_type)}</span></td>
         <td>${f.confidence ? (f.confidence * 100).toFixed(0) + '%' : '—'}</td>
         <td class="text-preview">${escHtml(details.subtype || JSON.stringify(details).slice(0, 60))}</td>
@@ -825,6 +825,15 @@ adminDb.auth.onAuthStateChange((event, session) => {
     showApp(session.user.email);
   }
 });
+
+// Expose functions to global scope for onclick handlers
+window.resolveReport = resolveReport;
+window.hideContent = hideContent;
+window.reviewFlag = reviewFlag;
+window.openActionModal = openActionModal;
+window.closeModal = closeModal;
+window.revokeAction = revokeAction;
+window.submitAction = submitAction;
 </script>
 </body>
 </html>
