@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zelofun™ — Moderation Admin Panel</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface-hover: #22263a;
+      --border: #2a2e3f;
+      --text: #e0e0e8;
+      --text-dim: #888;
+      --accent: #4f8cff;
+      --accent-hover: #6ba0ff;
+      --red: #ff4d6a;
+      --orange: #ff9f43;
+      --yellow: #ffc048;
+      --green: #2ed573;
+      --purple: #a55eea;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ========== AUTH SCREEN ========== */
+    #auth-screen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; flex-direction: column; gap: 20px;
+    }
+    #auth-screen h1 { font-size: 28px; }
+    #auth-screen p { color: var(--text-dim); }
+    .btn {
+      padding: 10px 20px; border: none; border-radius: var(--radius);
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-danger:hover { opacity: 0.85; }
+    .btn-warning { background: var(--orange); color: #000; }
+    .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--text); color: var(--text); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    /* ========== MAIN LAYOUT ========== */
+    #app { display: none; }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 24px; border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    header h1 { font-size: 20px; display: flex; align-items: center; gap: 8px; }
+    header .user-info { display: flex; align-items: center; gap: 12px; color: var(--text-dim); font-size: 13px; }
+
+    /* ========== TABS ========== */
+    .tabs {
+      display: flex; gap: 0; border-bottom: 1px solid var(--border);
+      background: var(--surface); padding: 0 24px;
+    }
+    .tab {
+      padding: 12px 20px; cursor: pointer; font-size: 14px; font-weight: 500;
+      color: var(--text-dim); border-bottom: 2px solid transparent; transition: all 0.2s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab .badge {
+      background: var(--red); color: #fff; padding: 2px 7px; border-radius: 10px;
+      font-size: 11px; margin-left: 6px;
+    }
+
+    /* ========== CONTENT ========== */
+    .content { padding: 24px; max-width: 1400px; margin: 0 auto; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ========== STATS GRID ========== */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px;
+    }
+    .stat-card .label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card .value { font-size: 32px; font-weight: 700; margin-top: 4px; }
+    .stat-card .value.red { color: var(--red); }
+    .stat-card .value.green { color: var(--green); }
+    .stat-card .value.orange { color: var(--orange); }
+
+    /* ========== TABLE ========== */
+    .table-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .table-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+    }
+    .table-header h2 { font-size: 16px; }
+    .table-header .controls { display: flex; gap: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 10px 16px; text-align: left; font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+    tr:hover { background: var(--surface-hover); }
+    .status-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 12px;
+      font-size: 11px; font-weight: 600;
+    }
+    .status-pending { background: rgba(255, 192, 72, 0.15); color: var(--yellow); }
+    .status-visible { background: rgba(46, 213, 115, 0.15); color: var(--green); }
+    .status-hidden { background: rgba(255, 77, 106, 0.15); color: var(--red); }
+    .status-shadow { background: rgba(165, 94, 234, 0.15); color: var(--purple); }
+    .status-review { background: rgba(255, 159, 67, 0.15); color: var(--orange); }
+    .status-active { background: rgba(46, 213, 115, 0.15); color: var(--green); }
+    .status-muted { background: rgba(255, 159, 67, 0.15); color: var(--orange); }
+    .status-banned { background: rgba(255, 77, 106, 0.15); color: var(--red); }
+
+    /* ========== SEARCH ========== */
+    .search-bar {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    .search-bar input {
+      flex: 1; padding: 10px 14px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--surface);
+      color: var(--text); font-size: 14px; outline: none;
+    }
+    .search-bar input:focus { border-color: var(--accent); }
+    select {
+      padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+      background: var(--surface); color: var(--text); font-size: 13px; outline: none;
+    }
+
+    /* ========== MODAL ========== */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 24px; min-width: 400px; max-width: 600px; max-height: 80vh; overflow-y: auto;
+    }
+    .modal h3 { margin-bottom: 16px; }
+    .modal .field { margin-bottom: 12px; }
+    .modal .field label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+    .modal .field select, .modal .field input, .modal .field textarea {
+      width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--bg); color: var(--text); font-size: 13px;
+    }
+    .modal .actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .content { padding: 16px; }
+      table { font-size: 12px; }
+      td, th { padding: 8px 10px; }
+    }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-dim); }
+    .empty-state p { margin-top: 8px; }
+    .loading { text-align: center; padding: 40px; color: var(--text-dim); }
+    .trust-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: rgba(79, 140, 255, 0.15); color: var(--accent); }
+    .text-preview { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .flag-tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin: 1px; background: rgba(255, 255, 255, 0.06); }
+  </style>
+</head>
+<body>
+
+<!-- ========== AUTH SCREEN ========== -->
+<div id="auth-screen">
+  <h1>🛡️ Zelofun™ Moderation</h1>
+  <p>Admin access only — authenticate with Google</p>
+  <button class="btn btn-primary" id="btn-login">Sign in with Google</button>
+  <p id="auth-error" style="color: var(--red); display: none;"></p>
+</div>
+
+<!-- ========== MAIN APP ========== -->
+<div id="app">
+  <header>
+    <h1>🛡️ Moderation Panel</h1>
+    <div class="user-info">
+      <span id="admin-email"></span>
+      <button class="btn btn-ghost btn-sm" id="btn-logout">Logout</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="dashboard">Dashboard</div>
+    <div class="tab" data-tab="reports">Reports <span class="badge" id="pending-badge">0</span></div>
+    <div class="tab" data-tab="flags">Auto-Flags</div>
+    <div class="tab" data-tab="users">Users</div>
+    <div class="tab" data-tab="actions">Mod Actions</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ========== DASHBOARD ========== -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card"><div class="label">Pending Reports</div><div class="value red" id="stat-pending">—</div></div>
+        <div class="stat-card"><div class="label">Resolved Today</div><div class="value green" id="stat-resolved">—</div></div>
+        <div class="stat-card"><div class="label">Auto-Hides Today</div><div class="value orange" id="stat-autohides">—</div></div>
+        <div class="stat-card"><div class="label">Active Mutes</div><div class="value" id="stat-mutes">—</div></div>
+        <div class="stat-card"><div class="label">Shadow Bans</div><div class="value" id="stat-shadows">—</div></div>
+        <div class="stat-card"><div class="label">Active Bans</div><div class="value red" id="stat-bans">—</div></div>
+        <div class="stat-card"><div class="label">New Accounts (24h)</div><div class="value" id="stat-newusers">—</div></div>
+        <div class="stat-card"><div class="label">Flagged Content</div><div class="value orange" id="stat-flagged">—</div></div>
+      </div>
+    </div>
+
+    <!-- ========== REPORTS ========== -->
+    <div class="panel" id="panel-reports">
+      <div class="search-bar">
+        <select id="report-filter">
+          <option value="pending">Pending</option>
+          <option value="reviewed">Reviewed</option>
+          <option value="resolved">Resolved</option>
+          <option value="all">All</option>
+        </select>
+        <input type="text" id="report-search" placeholder="Search by cellophane ID or reporter...">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Content</th>
+              <th>Reason</th>
+              <th>Reporter</th>
+              <th># Reports</th>
+              <th>Author</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reports-body">
+            <tr><td colspan="7" class="loading">Loading reports...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== AUTO-FLAGS ========== -->
+    <div class="panel" id="panel-flags">
+      <div class="search-bar">
+        <select id="flag-filter-type">
+          <option value="all">All Types</option>
+          <option value="auto_pii">PII</option>
+          <option value="auto_heuristic">Spam Heuristic</option>
+          <option value="auto_blocklist">Blocklist</option>
+          <option value="user_report">User Report</option>
+        </select>
+        <select id="flag-filter-status">
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="dismissed">Dismissed</option>
+          <option value="all">All</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Cellophane</th>
+              <th>Flag Type</th>
+              <th>Confidence</th>
+              <th>Details</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="flags-body">
+            <tr><td colspan="7" class="loading">Loading flags...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== USERS ========== -->
+    <div class="panel" id="panel-users">
+      <div class="search-bar">
+        <input type="text" id="user-search" placeholder="Search by name, email, or user ID...">
+        <select id="user-filter">
+          <option value="all">All Users</option>
+          <option value="shadow_banned">Shadow Banned</option>
+          <option value="muted">Muted</option>
+          <option value="suspended">Suspended</option>
+          <option value="banned">Banned</option>
+          <option value="warned">Warned</option>
+        </select>
+        <button class="btn btn-primary btn-sm" id="btn-search-users">Search</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Trust</th>
+              <th>Mod Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-body">
+            <tr><td colspan="6" class="empty-state"><p>Search for a user above</p></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== MOD ACTIONS LOG ========== -->
+    <div class="panel" id="panel-actions">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Action</th>
+              <th>Reason</th>
+              <th>Expires</th>
+              <th>By</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="actions-body">
+            <tr><td colspan="7" class="loading">Loading actions...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ACTION MODAL ========== -->
+<div class="modal-overlay" id="modal-action">
+  <div class="modal">
+    <h3 id="modal-title">Moderate User</h3>
+    <div class="field">
+      <label>User</label>
+      <input type="text" id="modal-user-display" readonly>
+      <input type="hidden" id="modal-user-id">
+    </div>
+    <div class="field">
+      <label>Action</label>
+      <select id="modal-action-type">
+        <option value="warn">⚠️ Warn (notification only)</option>
+        <option value="mute">🔇 Mute (can't post)</option>
+        <option value="shadow_ban">👻 Shadow Ban (invisible posts)</option>
+        <option value="suspend">⛔ Suspend (full block)</option>
+        <option value="ban">🚫 Ban (permanent)</option>
+      </select>
+    </div>
+    <div class="field" id="modal-duration-field">
+      <label>Duration</label>
+      <select id="modal-duration">
+        <option value="24h">24 hours</option>
+        <option value="7d">7 days</option>
+        <option value="30d">30 days</option>
+        <option value="permanent">Permanent</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Reason</label>
+      <textarea id="modal-reason" rows="3" placeholder="Reason for this action..."></textarea>
+    </div>
+    <div class="actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" id="modal-submit">Apply Action</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCRIPTS ========== -->
+<script type="module">
+// ESM import — completely isolated from extension's window.supabase
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// ============================================================
+// CONFIG
+// ============================================================
+const SUPABASE_URL = 'https://tlukysxlypmextjndyfl.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsdWt5c3hseXBtZXh0am5keWZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2MzgyNjksImV4cCI6MjA3MjIxNDI2OX0.FMuY_YZ9ggh6h71JmqJAEOSL-LFwBI0zdG_tKjBCfSA';
+const ADMIN_EMAIL = 'nati@d-yo.com';
+
+const adminDb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================================
+// AUTH
+// ============================================================
+async function checkAuth() {
+  const { data: { session } } = await adminDb.auth.getSession();
+  if (session && session.user.email === ADMIN_EMAIL) {
+    showApp(session.user.email);
+  } else if (session) {
+    showAuthError('Access denied. Admin only.');
+    await adminDb.auth.signOut();
+  }
+}
+
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const { error } = await adminDb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: 'https://zelofun.com/admin.html' }
+  });
+  if (error) showAuthError(error.message);
+});
+
+document.getElementById('btn-logout').addEventListener('click', async () => {
+  await adminDb.auth.signOut();
+  location.reload();
+});
+
+function showApp(email) {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('admin-email').textContent = email;
+  loadDashboard();
+  loadReports();
+  loadFlags();
+  loadModActions();
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ============================================================
+// TABS
+// ============================================================
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(`panel-${tab.dataset.tab}`).classList.add('active');
+  });
+});
+
+// ============================================================
+// DASHBOARD STATS
+// ============================================================
+async function loadDashboard() {
+  try {
+    // Pending reports
+    const { count: pending } = await supabase
+      .from('reports').select('*', { count: 'exact', head: true })
+      .eq('status', 'pending');
+    document.getElementById('stat-pending').textContent = pending || 0;
+    document.getElementById('pending-badge').textContent = pending || 0;
+
+    // Resolved today
+    const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+    const { count: resolved } = await supabase
+      .from('reports').select('*', { count: 'exact', head: true })
+      .eq('status', 'resolved')
+      .gte('reviewed_at', todayStart.toISOString());
+    document.getElementById('stat-resolved').textContent = resolved || 0;
+
+    // Auto-hides today
+    const { count: autohides } = await supabase
+      .from('content_flags').select('*', { count: 'exact', head: true })
+      .gte('created_at', todayStart.toISOString());
+    document.getElementById('stat-autohides').textContent = autohides || 0;
+
+    // Active mutes
+    const { count: mutes } = await supabase
+      .from('users').select('*', { count: 'exact', head: true })
+      .eq('moderation_status', 'muted');
+    document.getElementById('stat-mutes').textContent = mutes || 0;
+
+    // Shadow bans
+    const { count: shadows } = await supabase
+      .from('users').select('*', { count: 'exact', head: true })
+      .eq('moderation_status', 'shadow_banned');
+    document.getElementById('stat-shadows').textContent = shadows || 0;
+
+    // Bans
+    const { count: bans } = await supabase
+      .from('users').select('*', { count: 'exact', head: true })
+      .eq('moderation_status', 'banned');
+    document.getElementById('stat-bans').textContent = bans || 0;
+
+    // New accounts 24h
+    const yesterday = new Date(Date.now() - 86400000).toISOString();
+    const { count: newusers } = await supabase
+      .from('users').select('*', { count: 'exact', head: true })
+      .gte('created_at', yesterday);
+    document.getElementById('stat-newusers').textContent = newusers || 0;
+
+    // Flagged content (pending)
+    const { count: flagged } = await supabase
+      .from('content_flags').select('*', { count: 'exact', head: true })
+      .eq('status', 'pending');
+    document.getElementById('stat-flagged').textContent = flagged || 0;
+
+  } catch (err) {
+    console.error('Dashboard load error:', err);
+  }
+}
+
+// ============================================================
+// REPORTS
+// ============================================================
+async function loadReports() {
+  const filter = document.getElementById('report-filter').value;
+  const search = document.getElementById('report-search').value.trim();
+
+  let query = adminDb.from('reports').select('*').order('created_at', { ascending: false }).limit(50);
+
+  if (filter !== 'all') query = query.eq('status', filter);
+  if (search) query = query.or(`cellophane_id.eq.${search},reporter_name.ilike.%${search}%`);
+
+  const { data, error } = await query;
+  const tbody = document.getElementById('reports-body');
+
+  if (error || !data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No reports found</p></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(r => `
+    <tr>
+      <td class="text-preview">${escHtml(r.cellophane_id || '—')}</td>
+      <td>${escHtml(r.reason || '—')}</td>
+      <td>${escHtml(r.reporter_name || 'Anonymous')}</td>
+      <td>1</td>
+      <td>—</td>
+      <td><span class="status-badge status-${r.status === 'pending' ? 'pending' : r.status === 'resolved' ? 'visible' : 'review'}">${r.status}</span></td>
+      <td>
+        ${r.status === 'pending' ? `
+          <button class="btn btn-sm btn-ghost" onclick="resolveReport('${r.id}', 'reviewed')">Review</button>
+          <button class="btn btn-sm btn-primary" onclick="hideContent('${r.cellophane_id}'); resolveReport('${r.id}', 'resolved')">Hide</button>
+        ` : '—'}
+      </td>
+    </tr>
+  `).join('');
+}
+
+document.getElementById('report-filter').addEventListener('change', loadReports);
+document.getElementById('report-search').addEventListener('keyup', debounce(loadReports, 300));
+
+async function resolveReport(reportId, status) {
+  const { data: { session } } = await adminDb.auth.getSession();
+  await adminDb.from('reports').update({
+    status: status,
+    reviewed_at: new Date().toISOString(),
+    reviewed_by: session.user.email
+  }).eq('id', reportId);
+  loadReports();
+  loadDashboard();
+}
+
+async function hideContent(cellophaneId) {
+  await adminDb.from('cellophanes')
+    .update({ moderation_status: 'hidden' })
+    .eq('id', cellophaneId);
+}
+
+// ============================================================
+// AUTO-FLAGS
+// ============================================================
+async function loadFlags() {
+  const typeFilter = document.getElementById('flag-filter-type').value;
+  const statusFilter = document.getElementById('flag-filter-status').value;
+
+  let query = adminDb.from('content_flags').select('*').order('created_at', { ascending: false }).limit(50);
+
+  if (typeFilter !== 'all') query = query.eq('flag_type', typeFilter);
+  if (statusFilter !== 'all') query = query.eq('status', statusFilter);
+
+  const { data, error } = await query;
+  const tbody = document.getElementById('flags-body');
+
+  if (error || !data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No flags found</p></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(f => {
+    const details = f.details || {};
+    return `
+      <tr>
+        <td class="text-preview">${escHtml(f.cellophane_id)}</td>
+        <td><span class="flag-tag">${escHtml(f.flag_type)}</span></td>
+        <td>${f.confidence ? (f.confidence * 100).toFixed(0) + '%' : '—'}</td>
+        <td class="text-preview">${escHtml(details.subtype || JSON.stringify(details).slice(0, 60))}</td>
+        <td><span class="status-badge status-${f.status === 'pending' ? 'pending' : f.status === 'confirmed' ? 'hidden' : 'active'}">${f.status}</span></td>
+        <td>${timeAgo(f.created_at)}</td>
+        <td>
+          ${f.status === 'pending' ? `
+            <button class="btn btn-sm btn-ghost" onclick="reviewFlag('${f.id}', 'confirmed')">Confirm</button>
+            <button class="btn btn-sm btn-ghost" onclick="reviewFlag('${f.id}', 'dismissed')">Dismiss</button>
+          ` : '—'}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+document.getElementById('flag-filter-type').addEventListener('change', loadFlags);
+document.getElementById('flag-filter-status').addEventListener('change', loadFlags);
+
+async function reviewFlag(flagId, status) {
+  const { data: { session } } = await adminDb.auth.getSession();
+  await adminDb.from('content_flags').update({
+    status: status,
+    reviewed_at: new Date().toISOString(),
+    reviewed_by: session.user.email
+  }).eq('id', flagId);
+  loadFlags();
+  loadDashboard();
+}
+
+// ============================================================
+// USERS
+// ============================================================
+document.getElementById('btn-search-users').addEventListener('click', loadUsers);
+document.getElementById('user-search').addEventListener('keyup', (e) => { if (e.key === 'Enter') loadUsers(); });
+document.getElementById('user-filter').addEventListener('change', loadUsers);
+
+async function loadUsers() {
+  const search = document.getElementById('user-search').value.trim();
+  const filter = document.getElementById('user-filter').value;
+  const tbody = document.getElementById('users-body');
+
+  if (!search && filter === 'all') {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>Search for a user or select a filter</p></td></tr>';
+    return;
+  }
+
+  let query = adminDb.from('users').select('*').order('created_at', { ascending: false }).limit(50);
+
+  if (search) {
+    query = query.or(`display_name.ilike.%${search}%,email.ilike.%${search}%,id.eq.${search}`);
+  }
+  if (filter !== 'all') {
+    query = query.eq('moderation_status', filter);
+  }
+
+  const { data, error } = await query;
+
+  if (error || !data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>No users found</p></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(u => `
+    <tr>
+      <td>${escHtml(u.display_name || u.username || '—')}</td>
+      <td style="color: var(--text-dim); font-size: 12px;">${escHtml(u.email || '—')}</td>
+      <td><span class="trust-badge">T${u.trust_level || 0}</span></td>
+      <td><span class="status-badge status-${getStatusClass(u.moderation_status)}">${u.moderation_status || 'active'}</span></td>
+      <td>${timeAgo(u.created_at)}</td>
+      <td>
+        <button class="btn btn-sm btn-warning" onclick="openActionModal('${u.id}', '${escHtml(u.display_name || u.email)}')">Action</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ============================================================
+// MOD ACTIONS LOG
+// ============================================================
+async function loadModActions() {
+  const { data, error } = await supabase
+    .from('user_moderation')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  const tbody = document.getElementById('actions-body');
+
+  if (error || !data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No moderation actions yet</p></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(a => `
+    <tr>
+      <td style="font-size: 12px; color: var(--text-dim);">${escHtml(a.user_id)}</td>
+      <td><span class="status-badge status-${getStatusClass(a.action)}">${a.action}</span></td>
+      <td class="text-preview">${escHtml(a.reason)}</td>
+      <td>${a.expires_at ? new Date(a.expires_at).toLocaleDateString() : 'Permanent'}</td>
+      <td style="font-size: 12px;">${escHtml(a.created_by)}</td>
+      <td>${timeAgo(a.created_at)}</td>
+      <td>
+        ${!a.revoked_at ? `<button class="btn btn-sm btn-ghost" onclick="revokeAction('${a.id}')">Revoke</button>` : '<span style="color:var(--green);">Revoked</span>'}
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function revokeAction(actionId) {
+  if (!confirm('Revoke this moderation action?')) return;
+  const { data: { session } } = await adminDb.auth.getSession();
+  await adminDb.from('user_moderation').update({
+    revoked_at: new Date().toISOString(),
+    revoked_by: session.user.email
+  }).eq('id', actionId);
+  loadModActions();
+  loadDashboard();
+}
+
+// ============================================================
+// ACTION MODAL
+// ============================================================
+function openActionModal(userId, displayName) {
+  document.getElementById('modal-user-id').value = userId;
+  document.getElementById('modal-user-display').value = displayName;
+  document.getElementById('modal-action-type').value = 'warn';
+  document.getElementById('modal-reason').value = '';
+  document.getElementById('modal-action').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-action').classList.remove('open');
+}
+
+document.getElementById('modal-action-type').addEventListener('change', (e) => {
+  const showDuration = ['mute', 'suspend', 'shadow_ban'].includes(e.target.value);
+  document.getElementById('modal-duration-field').style.display = showDuration ? 'block' : 'none';
+});
+
+document.getElementById('modal-submit').addEventListener('click', async () => {
+  const userId = document.getElementById('modal-user-id').value;
+  const action = document.getElementById('modal-action-type').value;
+  const reason = document.getElementById('modal-reason').value.trim();
+  const duration = document.getElementById('modal-duration').value;
+
+  if (!reason) { alert('Reason is required'); return; }
+
+  const { data: { session } } = await adminDb.auth.getSession();
+
+  let expiresAt = null;
+  if (['mute', 'suspend', 'shadow_ban'].includes(action) && duration !== 'permanent') {
+    const hours = { '24h': 24, '7d': 168, '30d': 720 };
+    expiresAt = new Date(Date.now() + (hours[duration] || 24) * 3600000).toISOString();
+  }
+
+  const { error } = await adminDb.from('user_moderation').insert({
+    user_id: userId,
+    action: action,
+    reason: reason,
+    expires_at: expiresAt,
+    created_by: session.user.email
+  });
+
+  if (error) {
+    alert('Error: ' + error.message);
+    return;
+  }
+
+  closeModal();
+  loadModActions();
+  loadUsers();
+  loadDashboard();
+});
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function escHtml(str) {
+  if (!str) return '';
+  const d = document.createElement('div');
+  d.textContent = String(str);
+  return d.innerHTML;
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '—';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return hours + 'h ago';
+  const days = Math.floor(hours / 24);
+  if (days < 30) return days + 'd ago';
+  return new Date(dateStr).toLocaleDateString();
+}
+
+function getStatusClass(status) {
+  const map = {
+    active: 'active', warned: 'review', warn: 'review',
+    muted: 'muted', mute: 'muted',
+    suspended: 'hidden', suspend: 'hidden',
+    banned: 'banned', ban: 'banned',
+    shadow_banned: 'shadow', shadow_ban: 'shadow',
+    visible: 'visible', hidden: 'hidden',
+    shadow_hidden: 'shadow', under_review: 'review',
+    pending: 'pending', confirmed: 'hidden', dismissed: 'active'
+  };
+  return map[status] || 'active';
+}
+
+function debounce(fn, ms) {
+  let timer;
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+}
+
+// Close modal on outside click
+document.getElementById('modal-action').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// ============================================================
+// INIT
+// ============================================================
+checkAuth();
+adminDb.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session?.user?.email === ADMIN_EMAIL) {
+    showApp(session.user.email);
+  }
+});
+</script>
+</body>
+</html>
