@@ -1,5 +1,5 @@
 /**
- * Cellophane - Shared Supabase Client
+ * Zelofun - Shared Supabase Client
  * Version: 1.8.4
  * 
  * Clean client for PWA (and future React Native).
@@ -419,7 +419,7 @@ const CelloCellophanes = {
             .select('url')
             .eq('visibility', 'public')
             .not('url', 'is', null)
-            .not('url', 'ilike', '%cellophane.ai/pwa%');
+            .not('url', 'ilike', '%zelofun.com/pwa%');
         
         if (error) return { data: [], error };
         if (!data || data.length === 0) return { data: [], error: null };
@@ -458,8 +458,8 @@ const CelloCellophanes = {
         const now = new Date().toISOString();
         
         // Normalize URL for consistency
-        let normalizedUrl = cellophane.url || 'https://cellophane.ai/pwa';
-        if (normalizedUrl !== 'https://cellophane.ai/pwa') {
+        let normalizedUrl = cellophane.url || 'https://zelofun.com/pwa';
+        if (normalizedUrl !== 'https://zelofun.com/pwa') {
             normalizedUrl = normalizeUrl(normalizedUrl);
         }
         
@@ -1101,13 +1101,13 @@ const CelloMedia = {
 // ===========================================
 
 const ACHIEVEMENTS = [
-    { id: 'first_cellophane', icon: '🎯', name: 'First Steps', description: 'Create your first cellophane', check: (s) => s.cellophanes >= 1 },
-    { id: 'ten_cellophanes', icon: '💫', name: 'Rising Star', description: 'Create 10 cellophanes', check: (s) => s.cellophanes >= 10 },
-    { id: 'fifty_cellophanes', icon: '🔥', name: 'On Fire', description: 'Create 50 cellophanes', check: (s) => s.cellophanes >= 50 },
+    { id: 'first_cellophane', icon: '🎯', name: 'First Steps', description: 'Create your first post', check: (s) => s.cellophanes >= 1 },
+    { id: 'ten_cellophanes', icon: '💫', name: 'Rising Star', description: 'Create 10 posts', check: (s) => s.cellophanes >= 10 },
+    { id: 'fifty_cellophanes', icon: '🔥', name: 'On Fire', description: 'Create 50 posts', check: (s) => s.cellophanes >= 50 },
     { id: 'first_follower', icon: '👤', name: 'First Fan', description: 'Get your first follower', check: (s) => s.followers >= 1 },
     { id: 'ten_followers', icon: '👥', name: 'Social Butterfly', description: 'Get 10 followers', check: (s) => s.followers >= 10 },
     { id: 'first_comment', icon: '💬', name: 'Conversation Starter', description: 'Leave your first comment', check: (s) => s.comments >= 1 },
-    { id: 'first_like', icon: '❤️', name: 'Spread the Love', description: 'Like your first cellophane', check: (s) => s.likes >= 1 }
+    { id: 'first_like', icon: '❤️', name: 'Spread the Love', description: 'Like your first post', check: (s) => s.likes >= 1 }
 ];
 
 const CelloGamification = {

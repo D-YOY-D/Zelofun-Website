@@ -1,5 +1,5 @@
 /**
- * Cellophane PWA - Main Application
+ * Zelofun PWA - Main Application
  * Version: 1.8.9
  * 
  * CHANGELOG:
@@ -260,7 +260,7 @@ function filterHiddenCellophanes(cellophanes) {
 // ===========================================
 
 async function initApp() {
-    console.log('🎬 Initializing Cellophane PWA v1.8.8...');
+    console.log('🎬 Initializing Zelofun PWA v1.8.8...');
     
     setupEventListeners();
     
@@ -324,7 +324,7 @@ async function handlePendingDeepLink() {
     
     if (error || !data) {
         console.error('❌ Deep link cellophane not found:', cellophaneId);
-        showToast('Cellophane not found', 'error');
+        showToast('Post not found', 'error');
         // Clean URL and go to feed
         clearDeepLinkUrl();
         return;
@@ -332,7 +332,7 @@ async function handlePendingDeepLink() {
     
     // Check if cellophane has a real URL (not PWA default)
     const hasRealUrl = data.url && 
-                       !data.url.includes('cellophane.ai/pwa') && 
+                       !data.url.includes('zelofun.com/pwa') && 
                        data.url !== '';
     
     if (hasRealUrl) {
@@ -676,7 +676,7 @@ async function loadMyFeed(reset = false) {
     
     if (error) {
         console.error('❌ Error loading my feed:', error);
-        showToast('Failed to load cellophanes', 'error');
+        showToast('Failed to load posts', 'error');
         return;
     }
     
@@ -1054,8 +1054,8 @@ async function handleShare(cellophane) {
     if (navigator.share) {
         try {
             await navigator.share({
-                title: 'Cellophane',
-                text: cellophane.text?.substring(0, 100) || 'Check out this cellophane',
+                title: 'Zelofun',
+                text: cellophane.text?.substring(0, 100) || 'Check out this post',
                 url: shareUrl
             });
         } catch (err) {
@@ -1094,7 +1094,7 @@ function handleDismiss(cellophaneId, cardElement) {
         hideCellophane(cellophaneId);
         
         // Show toast with undo
-        showToastWithUndo('Cellophane hidden', () => {
+        showToastWithUndo('Post hidden', () => {
             unhideCellophane(cellophaneId);
             // Reload current feed to show it again
             if (AppState.currentTab === 'my-feed') {
@@ -1209,7 +1209,7 @@ async function openCellophaneDetail(cellophane) {
     
     // Show "Add to this page" button if cellophane has a real URL (not PWA default)
     const hasRealUrl = cellophane.url && 
-                       !cellophane.url.includes('cellophane.ai/pwa') && 
+                       !cellophane.url.includes('zelofun.com/pwa') && 
                        cellophane.url !== '';
     
     if (DOM.btnAddToPage) {
@@ -1315,7 +1315,7 @@ function setupDetailModalEvents() {
 async function loadMoreFromSite(cellophane) {
     // Only show for cellophanes with real URLs (not PWA default)
     const hasRealUrl = cellophane.url && 
-                       !cellophane.url.includes('cellophane.ai/pwa') && 
+                       !cellophane.url.includes('zelofun.com/pwa') && 
                        cellophane.url !== '';
     
     if (!hasRealUrl) {
@@ -2321,8 +2321,8 @@ function renderProfileCellophanes(cellophanes, tabName) {
             DOM.profileContentEmpty.classList.remove('hidden');
             if (DOM.profileEmptyText) {
                 DOM.profileEmptyText.textContent = tabName === 'my' 
-                    ? 'No cellophanes yet' 
-                    : 'No liked cellophanes';
+                    ? 'No posts yet'
+                    : 'No liked posts';
             }
         }
         return;
@@ -2783,16 +2783,16 @@ async function handleCreateSubmit(e) {
     
     // Re-enable button
     DOM.btnCreateSubmit.disabled = false;
-    DOM.btnCreateSubmit.innerHTML = '<svg><use href="#icon-plus"/></svg><span>Create Cellophane</span>';
+    DOM.btnCreateSubmit.innerHTML = '<svg><use href="#icon-plus"/></svg><span>Create Post</span>';
     
     if (error) {
         console.error('❌ Create error:', error);
-        showToast('Failed to create cellophane', 'error');
+        showToast('Failed to create post', 'error');
         return;
     }
     
     console.log('✅ Created cellophane:', data);
-    showToast('Cellophane created! 🎉', 'success');
+    showToast('Post created! 🎉', 'success');
     
     // Clear media preview
     clearMediaPreview();

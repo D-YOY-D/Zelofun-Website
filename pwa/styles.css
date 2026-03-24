@@ -1,12 +1,12 @@
 /**
- * Cellophane PWA - Styles
+ * Zelofun PWA - Styles
  * Version: 1.2.0
  * 
  * Matching Figma design with colorful cards
  */
 
 /* ===========================================
-   CSS Variables - Cellophane Brand Colors
+   CSS Variables - Zelofun Brand Colors
    =========================================== */
 
 :root {
@@ -452,7 +452,7 @@ img {
 }
 
 /* ===========================================
-   Cellophane Card - Figma Design
+   Post Card - Figma Design
    =========================================== */
 
 .cellophane-card {
@@ -1317,7 +1317,7 @@ img {
 }
 
 /* ===========================================
-   Create Cellophane Form
+   Create Post Form
    =========================================== */
 
 .create-form {
@@ -2211,7 +2211,7 @@ img {
     color: var(--color-primary-dark);
 }
 
-/* Profile Cellophanes List */
+/* Profile Posts List */
 .profile-cellophanes-list {
     display: flex;
     flex-direction: column;

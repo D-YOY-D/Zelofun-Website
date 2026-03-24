@@ -8,9 +8,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Cellophane">
+    <meta name="apple-mobile-web-app-title" content="Zelofun">
     <meta name="theme-color" content="#3b82f6">
-    <meta name="description" content="Cellophane - The Social Layer of the Internet">
+    <meta name="description" content="Zelofun - Voice Yourself Anywhere">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -27,7 +27,7 @@
     <!-- Styles - versioning via SW CACHE_NAME -->
     <link rel="stylesheet" href="styles.css">
     
-    <title>Cellophane</title>
+    <title>Zelofun</title>
 </head>
 <body>
     <!-- SVG Icons Definition -->
@@ -170,9 +170,9 @@
         <div id="screen-login" class="screen active">
             <div class="login-container">
                 <div class="login-logo">
-                    <img src="icons/icon-128.png" alt="Cellophane" class="logo-image">
-                    <h1>Cellophane</h1>
-                    <p class="tagline">The Social Layer of the Internet</p>
+                    <img src="icons/icon-128.png" alt="Zelofun" class="logo-image">
+                    <h1>Zelofun™</h1>
+                    <p class="tagline">Voice Yourself Anywhere</p>
                 </div>
                 
                 <div class="login-content">
@@ -193,7 +193,7 @@
                 </div>
                 
                 <div class="login-footer">
-                    <p>By signing in you agree to our <a href="https://cellophane.ai/terms.html">Terms of Service</a></p>
+                    <p>By signing in you agree to our <a href="https://zelofun.com/terms.html">Terms of Service</a></p>
                 </div>
             </div>
         </div>
@@ -205,10 +205,10 @@
             <header class="app-header">
                 <div class="header-content">
                     <div class="header-logo">
-                        <img src="icons/icon-32.png" alt="Cellophane" class="header-icon">
+                        <img src="icons/icon-32.png" alt="Zelofun" class="header-icon">
                         <div>
-                            <span class="logo-text">Cellophane</span>
-                            <div class="header-subtitle">Transparent Social Layer</div>
+                            <span class="logo-text">Zelofun</span>
+                            <div class="header-subtitle">Voice Yourself Anywhere</div>
                         </div>
                     </div>
                     <div class="header-actions">
@@ -231,7 +231,7 @@
             <nav class="tab-nav">
                 <button class="tab-btn active" data-tab="my-feed">
                     <svg><use href="#icon-user"/></svg>
-                    <span>My Cellophanes</span>
+                    <span>My Posts</span>
                 </button>
                 <button class="tab-btn" data-tab="following">
                     <svg><use href="#icon-users"/></svg>
@@ -249,16 +249,16 @@
                 <!-- My Feed -->
                 <div id="feed-my" class="feed active">
                     <div class="feed-header">
-                        <h2>My Cellophanes</h2>
+                        <h2>My Posts</h2>
                         <span id="my-feed-count" class="feed-count">0</span>
                     </div>
                     <div id="my-feed-list" class="feed-list">
-                        <!-- Cellophanes will be loaded here -->
+                        <!-- Posts will be loaded here -->
                     </div>
                     <div id="my-feed-empty" class="empty-state hidden">
                         <div class="empty-icon">📝</div>
-                        <h3>No cellophanes yet</h3>
-                        <p>Create your first cellophane from the browser extension</p>
+                        <h3>No posts yet</h3>
+                        <p>Create your first post from the browser extension</p>
                     </div>
                     <div id="my-feed-loading" class="loading-state hidden">
                         <div class="spinner"></div>
@@ -273,12 +273,12 @@
                         <span id="following-feed-count" class="feed-count">0</span>
                     </div>
                     <div id="following-feed-list" class="feed-list">
-                        <!-- Cellophanes will be loaded here -->
+                        <!-- Posts will be loaded here -->
                     </div>
                     <div id="following-feed-empty" class="empty-state hidden">
                         <div class="empty-icon">👥</div>
-                        <h3>No cellophanes from followed users</h3>
-                        <p>Follow people to see their cellophanes here</p>
+                        <h3>No posts from followed users</h3>
+                        <p>Follow people to see their posts here</p>
                     </div>
                     <div id="following-feed-loading" class="loading-state hidden">
                         <div class="spinner"></div>
@@ -324,11 +324,11 @@
                             <span id="browse-timeline-count" class="feed-count">0</span>
                         </div>
                         <div id="browse-timeline-list" class="feed-list">
-                            <!-- Timeline cellophanes loaded dynamically -->
+                            <!-- Timeline posts loaded dynamically -->
                         </div>
                         <div id="browse-timeline-empty" class="empty-state hidden">
                             <div class="empty-icon">🔍</div>
-                            <h3>No cellophanes found</h3>
+                            <h3>No posts found</h3>
                             <p>No one has posted on this site yet</p>
                         </div>
                         <div id="browse-timeline-loading" class="loading-state hidden">
@@ -340,20 +340,20 @@
                 
             </main>
             
-            <!-- FAB - Create New Cellophane -->
+            <!-- FAB - Create New Post -->
             <button id="btn-create-fab" class="fab">
                 <svg><use href="#icon-plus"/></svg>
             </button>
             
         </div>
         
-        <!-- Create Cellophane Modal -->
+        <!-- Create Post Modal -->
         <div id="modal-create" class="modal">
             <div class="modal-overlay"></div>
             <div class="modal-content">
                 <div class="modal-header">
                     <button class="btn-back">←</button>
-                    <h3>New Cellophane</h3>
+                    <h3>New Post</h3>
                     <button class="btn-close">✕</button>
                 </div>
                 <div class="modal-body">
@@ -461,14 +461,14 @@
                         <!-- Submit Button -->
                         <button type="submit" id="btn-create-submit" class="btn btn-primary btn-full btn-public">
                             <svg><use href="#icon-plus"/></svg>
-                            <span>Create Cellophane</span>
+                            <span>Create Post</span>
                         </button>
                     </form>
                 </div>
             </div>
         </div>
         
-        <!-- Cellophane Detail Modal -->
+        <!-- Post Detail Modal -->
         <div id="modal-detail" class="modal">
             <div class="modal-overlay"></div>
             <div class="modal-content">
@@ -476,18 +476,18 @@
                     <button class="btn-back">
                         <span>←</span>
                     </button>
-                    <h3>Cellophane</h3>
+                    <h3>Post</h3>
                     <button class="btn-close">✕</button>
                 </div>
                 <div class="modal-body">
                     <div id="detail-cellophane" class="cellophane-detail">
-                        <!-- Cellophane content loaded dynamically -->
+                        <!-- Post content loaded dynamically -->
                     </div>
                     
                     <!-- Add to this page button -->
                     <button id="btn-add-to-page" class="btn btn-add-to-page hidden">
                         <svg><use href="#icon-plus"/></svg>
-                        <span>Add your Cellophane to this page</span>
+                        <span>Add your post to this page</span>
                     </button>
                     
                     <div id="detail-comments" class="comments-section">
@@ -510,7 +510,7 @@
                             More from this site
                         </h4>
                         <div id="more-from-site-list" class="more-from-site-list">
-                            <!-- Related cellophanes loaded dynamically -->
+                            <!-- Related posts loaded dynamically -->
                         </div>
                     </div>
                 </div>
@@ -549,7 +549,7 @@
                     <div class="profile-stats">
                         <div class="stat">
                             <span class="stat-value" id="stat-cellophanes">-</span>
-                            <span class="stat-label">Cellophanes</span>
+                            <span class="stat-label">Posts</span>
                         </div>
                         <div class="stat">
                             <span class="stat-value" id="stat-followers">-</span>
@@ -602,7 +602,7 @@
                         <!-- Empty State -->
                         <div id="profile-content-empty" class="profile-content-empty hidden">
                             <svg class="empty-icon" width="48" height="48"><use href="#icon-message"></use></svg>
-                            <p id="profile-empty-text">No cellophanes yet</p>
+                            <p id="profile-empty-text">No posts yet</p>
                         </div>
                         
                         <!-- Error State -->
@@ -610,7 +610,7 @@
                             <p>Failed to load. <button id="btn-profile-retry" class="btn-link">Retry</button></p>
                         </div>
                         
-                        <!-- Cellophanes List -->
+                        <!-- Posts List -->
                         <div id="profile-cellophanes-list" class="profile-cellophanes-list hidden"></div>
                         
                         <!-- Load More Button -->

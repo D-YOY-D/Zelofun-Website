@@ -1,8 +1,8 @@
-# 📱 Cellophane PWA Icons
+# 📱 Zelofun PWA Icons
 
 ## Required Icons
 
-You need to create the following icon files from your Cellophane logo:
+You need to create the following icon files from your Zelofun logo:
 
 | Filename | Size | Purpose |
 |----------|------|---------|
@@ -18,7 +18,7 @@ You need to create the following icon files from your Cellophane logo:
 
 ## How to Create
 
-1. Use your Cellophane logo (🎬 or your actual logo)
+1. Use your Zelofun logo (or your actual logo)
 2. Create PNG files in each size
 3. Make sure background is transparent or matches theme color (#667eea)
 4. For maskable icons, keep important content within the safe zone (center 80%)

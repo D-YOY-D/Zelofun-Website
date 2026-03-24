@@ -1,7 +1,7 @@
 {
-    "name": "Cellophane",
-    "short_name": "Cellophane",
-    "description": "The Social Layer of the Internet",
+    "name": "Zelofun",
+    "short_name": "Zelofun",
+    "description": "Voice Yourself Anywhere",
     "start_url": "/pwa/",
     "display": "standalone",
     "orientation": "portrait",
@@ -62,16 +62,16 @@
     "categories": ["social", "lifestyle"],
     "shortcuts": [
         {
-            "name": "My Cellophanes",
+            "name": "My Posts",
             "short_name": "My Feed",
-            "description": "View your cellophanes",
+            "description": "View your posts",
             "url": "/pwa/?tab=my-feed",
             "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
         },
         {
             "name": "Following",
             "short_name": "Following",
-            "description": "View cellophanes from people you follow",
+            "description": "View posts from people you follow",
             "url": "/pwa/?tab=following",
             "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
         }
