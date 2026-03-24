@@ -177,7 +177,7 @@
 
 <!-- ========== AUTH SCREEN ========== -->
 <div id="auth-screen">
-  <h1>🛡️ Zelofun™ Moderation</h1>
+  <h1>🛡️ Moderation Panel <span style="font-size:14px;color:#888;">v1.1</span></h1>
   <p>Admin access only — authenticate with Google</p>
   <button class="btn btn-primary" id="btn-login">Sign in with Google</button>
   <p id="auth-error" style="color: var(--red); display: none;"></p>
@@ -675,18 +675,18 @@ async function loadUsers() {
 // MOD ACTIONS LOG
 // ============================================================
 async function loadModActions() {
-  const { data, error } = await supabase
-    .from('user_moderation')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(50);
-
   const tbody = document.getElementById('actions-body');
+  try {
+    const { data, error } = await adminDb
+      .from('user_moderation')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
 
-  if (error || !data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No moderation actions yet</p></td></tr>';
-    return;
-  }
+    if (error || !data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No actions yet</p></td></tr>';
+      return;
+    }
 
   tbody.innerHTML = data.map(a => `
     <tr>
@@ -701,6 +701,9 @@ async function loadModActions() {
       </td>
     </tr>
   `).join('');
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No actions yet</p></td></tr>';
+  }
 }
 
 async function revokeAction(actionId) {
