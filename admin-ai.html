@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zelofun™ AI Worker Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: #f0f4f8;
+    color: #1e293b;
+    min-height: 100vh;
+  }
+
+  /* === HEADER === */
+  .header {
+    background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #a855f7 100%);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.25);
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .header-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: white; }
+  .header-title span { color: #c4b5fd; }
+  .header-sub { font-size: 12px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+  .badge {
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .badge-ok { background: rgba(255,255,255,0.2); color: #bbf7d0; }
+  .badge-err { background: rgba(255,255,255,0.2); color: #fecaca; }
+  .badge-load { background: rgba(255,255,255,0.2); color: #fef08a; }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .header-time { color: rgba(255,255,255,0.6); font-size: 12px; }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-default {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+  }
+  .btn-default:hover { background: rgba(255,255,255,0.25); }
+  .btn-primary {
+    background: white;
+    color: #6366f1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .btn-primary:hover { background: #f8fafc; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+  /* === CONTENT === */
+  .content { max-width: 1240px; margin: 0 auto; padding: 24px; }
+
+  /* === ALERT === */
+  .alert {
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    display: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .alert-ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+  .alert-warn { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+  .alert-err { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+  .alert-header { display: flex; justify-content: space-between; align-items: start; }
+  .alert-close { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; }
+  .alert-details { margin-top: 10px; font-size: 11px; }
+  .alert-details div { margin: 3px 0; padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
+
+  /* === STATS === */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+  .stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.03);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .stat-accent {
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    border-radius: 4px 0 0 4px;
+  }
+  .stat-inner { margin-left: 10px; display: flex; justify-content: space-between; align-items: start; }
+  .stat-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+  .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; color: #1e293b; margin-top: 4px; }
+  .stat-sub { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+  .stat-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+
+  /* === COUNTRY FILTER === */
+  .country-bar {
+    background: white;
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .country-bar h3 { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; white-space: nowrap; }
+  .country-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .country-chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .country-chip:hover { border-color: #cbd5e1; background: #f1f5f9; }
+  .country-chip.active { border-color: #6366f1; background: #eef2ff; color: #4338ca; }
+  .country-count {
+    background: #e2e8f0;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+  }
+  .country-chip.active .country-count { background: #c7d2fe; color: #4338ca; }
+
+  /* === PERSONA BAR === */
+  .persona-bar {
+    background: white;
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .persona-bar h3 { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin-bottom: 10px; }
+  .persona-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .persona-chip {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .persona-chip:hover { border-color: #cbd5e1; }
+  .persona-chip.active { border-color: #6366f1; background: #eef2ff; color: #4338ca; }
+  .persona-count {
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* === FILTER ROW === */
+  .filters {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 14px;
+    font-size: 12px;
+  }
+  .filters > span { color: #94a3b8; font-weight: 600; }
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: #cbd5e1; }
+  .filter-btn.active { border-color: #6366f1; background: #eef2ff; color: #4338ca; }
+  .filter-count { margin-left: auto; color: #94a3b8; font-size: 12px; font-weight: 600; }
+
+  /* === CELLOPHANE CARDS === */
+  .feed { display: flex; flex-direction: column; gap: 10px; }
+  .cello-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: all 0.2s;
+    border: 1px solid #f1f5f9;
+  }
+  .cello-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); transform: translateY(-1px); }
+  .cello-row { display: flex; align-items: start; gap: 14px; }
+  .cello-avatar {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .cello-body { flex: 1; min-width: 0; }
+  .cello-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .cello-author { font-weight: 700; color: #1e293b; font-size: 13px; }
+  .cello-flag { font-size: 14px; }
+  .cello-media-badge {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .cello-media-badge.gif { background: #fef3c7; color: #92400e; }
+  .cello-media-badge.img { background: #ede9fe; color: #5b21b6; }
+  .cello-time { color: #94a3b8; font-size: 11px; }
+  .cello-text { color: #334155; font-size: 13px; margin-top: 8px; line-height: 1.7; }
+  .cello-img {
+    margin-top: 10px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    max-width: 320px;
+  }
+  .cello-img img { width: 100%; height: 140px; object-fit: cover; display: block; }
+  .cello-footer { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .cello-url {
+    color: #6366f1;
+    font-size: 11px;
+    text-decoration: none;
+    max-width: 350px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    display: block;
+    font-weight: 500;
+  }
+  .cello-url:hover { color: #4338ca; text-decoration: underline; }
+  .cello-pos { color: #cbd5e1; font-size: 10px; }
+  .empty { text-align: center; padding: 60px; color: #94a3b8; font-size: 14px; }
+
+  .footer {
+    margin-top: 40px;
+    padding: 20px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 11px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== NAV BAR ========== -->
+<nav style="background:#1e293b;padding:12px 24px;display:flex;align-items:center;gap:24px;font-family:system-ui;position:sticky;top:0;z-index:1000;border-bottom:2px solid #6366f1">
+  <a href="admin.html" style="color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:6px;transition:all 0.2s">🛡️ Moderation</a>
+  <a href="admin-dashboard.html" style="color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:6px;transition:all 0.2s">📊 Dashboard</a>
+  <a href="admin-ai.html" style="background:#6366f1;color:white;text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:6px">🤖 AI Worker</a>
+  <a href="admin-analytics.html" style="color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:6px;transition:all 0.2s">📈 Analytics</a>
+  <div style="margin-left:auto;color:#475569;font-size:12px">Zelofun™ Admin</div>
+</nav>
+
+<!-- ========== AUTH SCREEN ========== -->
+<div id="auth-screen" style="display:flex;align-items:center;justify-content:center;min-height:80vh;flex-direction:column;gap:20px;font-family:system-ui;background:#0f172a;color:#e2e8f0">
+  <h1 style="font-size:28px">🤖 Zelofun™ AI Worker</h1>
+  <p style="color:#94a3b8">Admin access only — authenticate with Google</p>
+  <button id="btn-login" style="padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:#6366f1;color:#fff">Sign in with Google</button>
+  <p id="auth-error" style="color:#f43f5e;display:none"></p>
+</div>
+
+<!-- ========== MAIN APP (hidden until auth) ========== -->
+<div id="app" style="display:none">
+<div class="header">
+  <div class="header-left">
+    <div class="logo">🤖</div>
+    <div>
+      <div class="header-title">Zelofun™ <span>AI Worker</span></div>
+      <div class="header-sub">
+        <span id="hVersion">v...</span>
+        <span>•</span>
+        <span id="hModel">...</span>
+        <span>•</span>
+        <span id="hBadge" class="badge badge-load">◌ Loading</span>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="header-time" id="hTime"></span>
+    <button class="btn btn-default" onclick="refreshAll()">↻ Refresh</button>
+    <button class="btn btn-primary" onclick="triggerCron()">▶ Run Cron</button>
+  </div>
+</div>
+
+<div class="content">
+  <div class="alert" id="alertBox">
+    <div class="alert-header">
+      <div id="alertText"></div>
+      <button class="alert-close" onclick="document.getElementById('alertBox').style.display='none'">✕</button>
+    </div>
+    <div class="alert-details" id="alertDetails"></div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-accent" style="background: linear-gradient(180deg,#6366f1,#a855f7)"></div>
+      <div class="stat-inner">
+        <div>
+          <div class="stat-label">Total AI Posts</div>
+          <div class="stat-value" id="sTotal">0</div>
+          <div class="stat-sub">all time</div>
+        </div>
+        <div class="stat-icon" style="background:#eef2ff">📝</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-accent" style="background: linear-gradient(180deg,#a855f7,#ec4899)"></div>
+      <div class="stat-inner">
+        <div>
+          <div class="stat-label">With Media</div>
+          <div class="stat-value" id="sMedia">0</div>
+          <div class="stat-sub" id="sMediaSub">0 img / 0 gif</div>
+        </div>
+        <div class="stat-icon" style="background:#fdf4ff">🖼️</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-accent" style="background: linear-gradient(180deg,#10b981,#0ea5e9)"></div>
+      <div class="stat-inner">
+        <div>
+          <div class="stat-label">Personas Active</div>
+          <div class="stat-value" id="sPersonas">0</div>
+          <div class="stat-sub" id="totalPersonas">of 211</div>
+        </div>
+        <div class="stat-icon" style="background:#ecfdf5">👥</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-accent" style="background: linear-gradient(180deg,#f59e0b,#ef4444)"></div>
+      <div class="stat-inner">
+        <div>
+          <div class="stat-label">Countries</div>
+          <div class="stat-value" id="sCountries">0</div>
+          <div class="stat-sub" id="sCountriesSub"></div>
+        </div>
+        <div class="stat-icon" style="background:#fefce8">🌍</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="country-bar">
+    <h3>Countries</h3>
+    <div class="country-chips" id="countryChips"></div>
+  </div>
+
+  <div class="country-bar" id="verticalBar">
+    <h3>Verticals</h3>
+    <div class="country-chips" id="verticalChips"></div>
+  </div>
+
+  <div class="persona-bar">
+    <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:8px 0" onclick="togglePersonas()">
+      <h3 style="margin:0">Persona Breakdown</h3>
+      <span id="personaToggle" style="font-size:18px;transition:transform 0.2s">▼</span>
+    </div>
+    <div id="personaCollapse" style="transition:max-height 0.3s ease;overflow:hidden">
+      <div class="persona-chips" id="personaChips"></div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <span>Filter:</span>
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" data-filter="media" onclick="setFilter('media',this)">📎 With Media</button>
+    <span class="filter-count" id="filterCount">0 results</span>
+  </div>
+
+  <div class="feed" id="feed"></div>
+</div>
+
+<div class="footer">Zelofun™ AI Worker Dashboard v2.15 • 211 personas • 11 countries • 17 verticals • Auto-refresh every 60s</div>
+</div><!-- /app -->
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const BASE = "https://tlukysxlypmextjndyfl.supabase.co";
+const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsdWt5c3hseXBtZXh0am5keWZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2MzgyNjksImV4cCI6MjA3MjIxNDI2OX0.FMuY_YZ9ggh6h71JmqJAEOSL-LFwBI0zdG_tKjBCfSA";
+const WTOKEN = "7025a928ac0df6bb3f6c82fe9fa38d2025716876fc9c34cbf1ee9d13f9bc0195";
+const ADMIN_EMAIL = 'nati@d-yo.com';
+
+const authDb = createClient(BASE, ANON);
+
+// ============================================================
+// AUTH
+// ============================================================
+async function checkAuth() {
+  const { data: { session } } = await authDb.auth.getSession();
+  if (session && session.user.email === ADMIN_EMAIL) {
+    showApp();
+  } else if (session) {
+    showAuthError('Access denied. Admin only.');
+    await authDb.auth.signOut();
+  }
+}
+
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const { error } = await authDb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+  if (error) showAuthError(error.message);
+});
+
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  refreshAll();
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+checkAuth();
+authDb.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session?.user?.email === ADMIN_EMAIL) showApp();
+});
+
+// ============================================================
+// DATA
+// ============================================================
+const PCOL = {
+  // 🇮🇱 Israel
+  "Dana - Tech Observer":"#6366f1","יוסי - פרשן חדשות":"#ef4444","Rotem 😂":"#f59e0b",
+  "Maya - Global View":"#10b981","Alex - Deep Tech":"#8b5cf6",
+  // 🇬🇧 UK
+  "James - Westminster Watch":"#0ea5e9","Priya - London Life":"#ec4899",
+  "Oliver - Tech & Science UK":"#14b8a6","Fiona - Football & Culture":"#f97316",
+  "Tariq - Global Brit":"#64748b",
+  // 🇺🇸 USA
+  "Mike - Capitol Hill":"#dc2626","Sarah - Silicon Valley":"#7c3aed",
+  "DeShawn - Culture & Sports":"#ea580c","Elena - NYC Life":"#0891b2",
+  "Chris - Science & Space":"#059669",
+  // 🇩🇪 Germany
+  "Klaus - Berliner Politik":"#1e40af","Lena - Tech & Wissenschaft":"#7e22ce",
+  "Mehmet - Fußball & Kultur":"#b45309","Sophie - Wirtschaft":"#0f766e",
+  "Nico - Alltag & Meinung":"#be123c",
+  // 🇫🇷 France
+  "Pierre - Politique & Débat":"#1d4ed8","Camille - Tech & Innovation":"#9333ea",
+  "Yasmine - Culture & Société":"#c2410c","Lucas - Sport & Divertissement":"#0d9488",
+  "Margot - Économie & Quotidien":"#a21caf",
+  // 🇪🇸 Spain
+  "Carlos - Política y Sociedad":"#b91c1c","Lucía - Tech e Innovación":"#6d28d9",
+  "Javier - Fútbol y Deportes":"#ca8a04","María - Cultura y Vida":"#be185d",
+  "Ahmed - Economía y Debate":"#047857",
+  // 🇮🇹 Italy
+  "Marco - Politica e Società":"#9f1239","Giulia - Tech & Innovazione":"#4f46e5",
+  "Alessandro - Calcio e Sport":"#d97706","Valentina - Cultura e Lifestyle":"#db2777",
+  "Hassan - Economia e Lavoro":"#0e7490",
+  // 🇧🇷 Brazil
+  "Rafael - Política e Sociedade":"#15803d","Fernanda - Tech & Inovação":"#7c3aed",
+  "Thiago - Futebol e Esportes":"#eab308","Camila - Cultura e Vida":"#e11d48",
+  "João - Economia e Debate":"#0284c7",
+  // 🇯🇵 Japan
+  "Takeshi - 政治 & 社会":"#dc2626","Haruka - Tech & イノベーション":"#7c3aed",
+  "Yuki - アニメ & ポップカルチャー":"#f59e0b","Kenji - スポーツ & エンタメ":"#0ea5e9",
+  "Aiko - 経済 & ビジネス":"#059669",
+  // 🇹🇷 Turkey
+  "Mehmet Ali - Siyaset & Toplum":"#b91c1c","Zeynep - Teknoloji & Bilim":"#7e22ce",
+  "Emre - Futbol & Spor":"#ca8a04","Elif - Kültür & Yaşam":"#be185d",
+  "Burak - Ekonomi & Tartışma":"#0f766e",
+  // 🇮🇳 India
+  "Vikram - Politics & Society":"#9f1239","Neha - Tech & Startups":"#6d28d9",
+  "Arjun - Cricket & Sports":"#d97706","Priya - Bollywood & Culture":"#db2777",
+  "Amit - Economy & Business":"#047857",
+  // v2.14.0: Lifestyle Personas
+  // 🇮🇱 IL Fashion/Beauty/Music
+  "שירה - אופנה ישראלית":"#ec4899","נועה - סטייל וטרנדים":"#f472b6","Aviv - Street Style IL":"#a855f7",
+  "ליאור - ביוטי וטיפוח":"#f43f5e","תמר - איפור וסטייל":"#fb7185","Inbal - Beauty Blog IL":"#e11d48",
+  "אלון - מוזיקה ותרבות":"#8b5cf6","מיכל - פופ ומיינסטרים":"#a78bfa","Itai - Indie & Alt IL":"#7c3aed",
+  // 🇬🇧 UK Fashion/Beauty/Music
+  "Gemma - London Fashion":"#ec4899","Poppy - Style & Trends UK":"#f472b6","Aisha - Runway & Street UK":"#be185d",
+  "Charlotte - Beauty Edit UK":"#f43f5e","Grace - Skincare Diaries":"#fb7185","Zara - Makeup & Glam UK":"#e11d48",
+  "Liam - British Sound":"#8b5cf6","Freya - Indie & Alt UK":"#a78bfa","Idris - UK Music Scene":"#7c3aed",
+  // 🇺🇸 US Fashion/Beauty/Music
+  "Ava - NYC Style":"#ec4899","Jordan - Fashion Forward":"#f472b6","Mia - Runway Insider":"#be185d",
+  "Taylor - Beauty Editor":"#f43f5e","Zoe - Skincare & Glow":"#fb7185","Jade - Makeup Maven":"#e11d48",
+  "Marcus - Music Critic":"#8b5cf6","Aaliyah - Sound & Culture":"#a78bfa","Ryan - Indie Sounds":"#7c3aed",
+  // 🇩🇪 DE Fashion/Beauty/Music
+  "Anna - Mode & Stil":"#ec4899","Lea - Fashion Berlin":"#f472b6","Maren - Streetwear DE":"#be185d",
+  "Lisa - Beauty & Pflege":"#f43f5e","Jana - Makeup Trends DE":"#fb7185","Nadia - Skincare Expertin":"#e11d48",
+  "Felix - Musikszene DE":"#8b5cf6","Mila - Pop & Kultur DE":"#a78bfa","Tim - Indie & Alternative DE":"#7c3aed",
+  // v2.14.0: Food
+  "דנה - פוד בלוגרית":"#f97316","עומר - שף ביתי":"#ea580c","Noa - Vegan IL":"#65a30d",
+  "Brooklyn Bites - NYC Food":"#f97316","Maria - Farm to Table":"#ca8a04","Jake - BBQ & Comfort":"#dc2626",
+  "Ollie - London Eats":"#f97316","Preet - UK Food Critic":"#ea580c","Hana - Baking & Brunch UK":"#ec4899",
+  "Lara - Foodie Berlin":"#f97316","Sven - Küche & Genuss":"#ca8a04","Yuki - Street Food DE":"#ea580c",
+  // v2.14.0: Gaming
+  "גיא - גיימר ישראלי":"#22c55e","ליאם - אינדי גיימינג":"#16a34a","Shira - Mobile & Casual":"#4ade80",
+  "Tyler - FPS & Esports":"#22c55e","Destiny - RPG & Story":"#7c3aed","Alex - Tech & Hardware":"#2563eb",
+  "Callum - PC Gaming UK":"#22c55e","Sophie - Indie Games UK":"#16a34a","Rhys - Console & PS UK":"#2563eb",
+  "Max - Zocken & Reviews":"#22c55e","Finn - Retro & Indie DE":"#ca8a04","Lena - Gaming & Streaming":"#7c3aed",
+  // v2.14.0: Film & TV
+  "רון - קולנוע וטלוויזיה":"#06b6d4","מאיה - סדרות ודרמה":"#6366f1","Yael - Documentary & Art":"#64748b",
+  "Jasmine - Hollywood Insider":"#06b6d4","Devon - Streaming & Binge":"#7c3aed","Carlos - Horror & Sci-Fi":"#1e293b",
+  "Alfie - British Cinema":"#06b6d4","Rosie - TV & Drama UK":"#ec4899","Ethan - Sci-Fi & Fantasy UK":"#2563eb",
+  "Lukas - Film & Serien":"#06b6d4","Nina - Kino & Kritik":"#6366f1","Amir - Popkultur & Film":"#ca8a04",
+  // v2.15.0: Finance
+  "גלעד - שוק ההון":"#eab308","שרון - קריפטו ובלוקצ'יין":"#f59e0b","Eran - Startups & VC":"#6366f1",
+  "Marcus - Wall Street":"#eab308","Kayla - Crypto & DeFi":"#f59e0b","Derek - Personal Finance":"#22c55e",
+  "Oliver - City Finance":"#eab308","Amara - Fintech UK":"#6366f1","Rishi - UK Economy":"#f59e0b",
+  "Stefan - Börse & Finanzen":"#eab308","Julia - Krypto & Blockchain":"#f59e0b","Moritz - Wirtschaft & Geld":"#22c55e",
+  // v2.15.0: Travel
+  "דניאל - טייל בעולם":"#0ea5e9","ענת - טיולים משפחתיים":"#ec4899","Ori - Digital Nomad IL":"#6366f1",
+  "Megan - Wanderlust":"#0ea5e9","Jordan - Budget Travel":"#22c55e","Samantha - Luxury Travel":"#f59e0b",
+  "Chloe - Travel UK":"#0ea5e9","Kwame - Adventure UK":"#22c55e","Isla - Solo Travel UK":"#6366f1",
+  "Annika - Reisen & Abenteuer":"#0ea5e9","Tobias - Backpacking DE":"#22c55e","Leonie - Fernweh & Reise":"#ec4899",
+  // v2.15.0: Fitness
+  "יעל - כושר ואימונים":"#f43f5e","אור - תזונה ובריאות":"#22c55e","Noga - Yoga & Mindfulness":"#6366f1",
+  "Tanya - Gym & Gains":"#f43f5e","Darius - Run & Recovery":"#22c55e","Alicia - Wellness & Self-Care":"#ec4899",
+  "Phoebe - Fitness UK":"#f43f5e","Caleb - Strength UK":"#f97316","Fatima - Wellness UK":"#6366f1",
+  "Mia - Fitness & Sport":"#f43f5e","Henrik - Training & Health":"#22c55e","Carla - Yoga & Achtsamkeit":"#6366f1",
+  // v2.15.0: Books
+  "נועם - ספרים וספרות":"#8b5cf6","רינת - חינוך וטכנולוגיה":"#6366f1","Tal - Philosophy & Ideas":"#64748b",
+  "Harper - BookTok":"#ec4899","Elijah - Sci-Fi & Fantasy Reads":"#2563eb","Nina - Non-Fiction & Essays":"#64748b",
+  "Matilda - Literary UK":"#8b5cf6","Aiden - EdTech UK":"#2563eb","Imogen - Poetry & Prose UK":"#ec4899",
+  "Johanna - Bücher & Lesen":"#8b5cf6","Florian - Bildung & Wissen":"#6366f1","Lina - Literatur & Kultur":"#8b5cf6",
+  // v2.15.0: Cars
+  "איתי - רכב וטכנולוגיה":"#64748b","מיכאל - חשמליות ו-EV":"#22c55e","Lior - Car Tech IL":"#2563eb",
+  "Brayden - Muscle & Horsepower":"#dc2626","Courtney - EV & Green Drive":"#22c55e","Jalen - Truck & Off-Road":"#f97316",
+  "George - Top Gear Fan":"#64748b","Harry - F1 & Motorsport UK":"#dc2626","Zoe - Car Reviews UK":"#2563eb",
+  "Nico - Autos & Tuning":"#64748b","Kai - Elektro & Mobilität":"#22c55e","Timo - Oldtimer & Klassiker":"#f59e0b",
+  // v2.15.0: Pets
+  "שי - כלבים וחתולים":"#f97316","תהילה - אימוץ וחילוץ":"#ec4899","Amit - Animals & Nature IL":"#22c55e",
+  "Bella - Dog Mom":"#f97316","Miles - Exotic Pets":"#22c55e","Savannah - Cat Lady Life":"#ec4899",
+  "Lucy - Pet Life UK":"#f97316","Alfie - Vet & Advice UK":"#2563eb","Ellie - Wildlife UK":"#22c55e",
+  "Maren - Haustiere & Liebe":"#f97316","Jana - Tierrettung & Pflege":"#ec4899","Felix - Hunde & Natur":"#22c55e",
+  // v2.15.0: Science
+  "עמית - מדע וחלל":"#14b8a6","הילה - ביוטק ורפואה":"#6366f1","Yonatan - AI & Research IL":"#2563eb",
+  "Maya - Space & Astro":"#14b8a6","Theo - Climate & Earth":"#22c55e","Zane - Quantum & Physics":"#6366f1",
+  "Raj - Science UK":"#14b8a6","Sienna - BioTech UK":"#6366f1","Owen - Science Explainer UK":"#f59e0b",
+  "Nils - Forschung & Wissen":"#14b8a6","Clara - Klima & Umwelt":"#22c55e","Luisa - Medizin & Forschung":"#6366f1"
+};
+const PEMO = {
+  // 🇮🇱 Israel
+  "Dana - Tech Observer":"🔬","יוסי - פרשן חדשות":"📢","Rotem 😂":"😂",
+  "Maya - Global View":"🌍","Alex - Deep Tech":"⚙️",
+  // 🇬🇧 UK
+  "James - Westminster Watch":"🎩","Priya - London Life":"🏙️",
+  "Oliver - Tech & Science UK":"🔭","Fiona - Football & Culture":"⚽",
+  "Tariq - Global Brit":"🌐",
+  // 🇺🇸 USA
+  "Mike - Capitol Hill":"🏛️","Sarah - Silicon Valley":"💻",
+  "DeShawn - Culture & Sports":"🏀","Elena - NYC Life":"🗽",
+  "Chris - Science & Space":"🚀",
+  // 🇩🇪 Germany
+  "Klaus - Berliner Politik":"🏛️","Lena - Tech & Wissenschaft":"🔬",
+  "Mehmet - Fußball & Kultur":"⚽","Sophie - Wirtschaft":"📊",
+  "Nico - Alltag & Meinung":"💬",
+  // 🇫🇷 France
+  "Pierre - Politique & Débat":"🏛️","Camille - Tech & Innovation":"💡",
+  "Yasmine - Culture & Société":"🎭","Lucas - Sport & Divertissement":"⚽",
+  "Margot - Économie & Quotidien":"📈",
+  // 🇪🇸 Spain
+  "Carlos - Política y Sociedad":"🏛️","Lucía - Tech e Innovación":"💡",
+  "Javier - Fútbol y Deportes":"⚽","María - Cultura y Vida":"🎭",
+  "Ahmed - Economía y Debate":"📊",
+  // 🇮🇹 Italy
+  "Marco - Politica e Società":"🏛️","Giulia - Tech & Innovazione":"💡",
+  "Alessandro - Calcio e Sport":"⚽","Valentina - Cultura e Lifestyle":"🎭",
+  "Hassan - Economia e Lavoro":"📊",
+  // 🇧🇷 Brazil
+  "Rafael - Política e Sociedade":"🏛️","Fernanda - Tech & Inovação":"💡",
+  "Thiago - Futebol e Esportes":"⚽","Camila - Cultura e Vida":"🎭",
+  "João - Economia e Debate":"📊",
+  // 🇯🇵 Japan
+  "Takeshi - 政治 & 社会":"🏛️","Haruka - Tech & イノベーション":"💡",
+  "Yuki - アニメ & ポップカルチャー":"🎌","Kenji - スポーツ & エンタメ":"⚾",
+  "Aiko - 経済 & ビジネス":"📊",
+  // 🇹🇷 Turkey
+  "Mehmet Ali - Siyaset & Toplum":"🏛️","Zeynep - Teknoloji & Bilim":"🔬",
+  "Emre - Futbol & Spor":"⚽","Elif - Kültür & Yaşam":"🎭",
+  "Burak - Ekonomi & Tartışma":"📊",
+  // 🇮🇳 India
+  "Vikram - Politics & Society":"🏛️","Neha - Tech & Startups":"💡",
+  "Arjun - Cricket & Sports":"🏏","Priya - Bollywood & Culture":"🎬",
+  "Amit - Economy & Business":"📊",
+  // v2.14.0: Lifestyle Personas
+  "שירה - אופנה ישראלית":"👗","נועה - סטייל וטרנדים":"👠","Aviv - Street Style IL":"🧢",
+  "ליאור - ביוטי וטיפוח":"💄","תמר - איפור וסטייל":"💅","Inbal - Beauty Blog IL":"✨",
+  "אלון - מוזיקה ותרבות":"🎵","מיכל - פופ ומיינסטרים":"🎤","Itai - Indie & Alt IL":"🎸",
+  "Gemma - London Fashion":"👗","Poppy - Style & Trends UK":"👠","Aisha - Runway & Street UK":"👜",
+  "Charlotte - Beauty Edit UK":"💄","Grace - Skincare Diaries":"🧴","Zara - Makeup & Glam UK":"💅",
+  "Liam - British Sound":"🎵","Freya - Indie & Alt UK":"🎸","Idris - UK Music Scene":"🎧",
+  "Ava - NYC Style":"👗","Jordan - Fashion Forward":"👠","Mia - Runway Insider":"👜",
+  "Taylor - Beauty Editor":"💄","Zoe - Skincare & Glow":"🧴","Jade - Makeup Maven":"💅",
+  "Marcus - Music Critic":"🎵","Aaliyah - Sound & Culture":"🎤","Ryan - Indie Sounds":"🎸",
+  "Anna - Mode & Stil":"👗","Lea - Fashion Berlin":"👠","Maren - Streetwear DE":"🧢",
+  "Lisa - Beauty & Pflege":"💄","Jana - Makeup Trends DE":"💅","Nadia - Skincare Expertin":"🧴",
+  "Felix - Musikszene DE":"🎵","Mila - Pop & Kultur DE":"🎤","Tim - Indie & Alternative DE":"🎸",
+  // v2.14.0: Food
+  "דנה - פוד בלוגרית":"🍔","עומר - שף ביתי":"👨‍🍳","Noa - Vegan IL":"🌱",
+  "Brooklyn Bites - NYC Food":"🗽","Maria - Farm to Table":"🌾","Jake - BBQ & Comfort":"🔥",
+  "Ollie - London Eats":"🍽️","Preet - UK Food Critic":"⭐","Hana - Baking & Brunch UK":"🧁",
+  "Lara - Foodie Berlin":"🥨","Sven - Küche & Genuss":"🍺","Yuki - Street Food DE":"🥡",
+  // v2.14.0: Gaming
+  "גיא - גיימר ישראלי":"🎮","ליאם - אינדי גיימינג":"🕹️","Shira - Mobile & Casual":"📱",
+  "Tyler - FPS & Esports":"🎯","Destiny - RPG & Story":"⚔️","Alex - Tech & Hardware":"🖥️",
+  "Callum - PC Gaming UK":"💻","Sophie - Indie Games UK":"🎲","Rhys - Console & PS UK":"🎮",
+  "Max - Zocken & Reviews":"🏆","Finn - Retro & Indie DE":"👾","Lena - Gaming & Streaming":"📺",
+  // v2.14.0: Film & TV
+  "רון - קולנוע וטלוויזיה":"🎬","מאיה - סדרות ודרמה":"📺","Yael - Documentary & Art":"🎥",
+  "Jasmine - Hollywood Insider":"⭐","Devon - Streaming & Binge":"🍿","Carlos - Horror & Sci-Fi":"👽",
+  "Alfie - British Cinema":"🎩","Rosie - TV & Drama UK":"📺","Ethan - Sci-Fi & Fantasy UK":"🚀",
+  "Lukas - Film & Serien":"🎬","Nina - Kino & Kritik":"🎭","Amir - Popkultur & Film":"🦸",
+  // v2.15.0: Finance
+  "גלעד - שוק ההון":"📈","שרון - קריפטו ובלוקצ'יין":"₿","Eran - Startups & VC":"🚀",
+  "Marcus - Wall Street":"💹","Kayla - Crypto & DeFi":"🪙","Derek - Personal Finance":"💵",
+  "Oliver - City Finance":"🏦","Amara - Fintech UK":"💳","Rishi - UK Economy":"📊",
+  "Stefan - Börse & Finanzen":"📈","Julia - Krypto & Blockchain":"₿","Moritz - Wirtschaft & Geld":"💰",
+  // v2.15.0: Travel
+  "דניאל - טייל בעולם":"🌍","ענת - טיולים משפחתיים":"👨‍👩‍👧‍👦","Ori - Digital Nomad IL":"💻",
+  "Megan - Wanderlust":"✈️","Jordan - Budget Travel":"🎒","Samantha - Luxury Travel":"🏨",
+  "Chloe - Travel UK":"🧳","Kwame - Adventure UK":"🏔️","Isla - Solo Travel UK":"🗺️",
+  "Annika - Reisen & Abenteuer":"🌄","Tobias - Backpacking DE":"🎒","Leonie - Fernweh & Reise":"🌅",
+  // v2.15.0: Fitness
+  "יעל - כושר ואימונים":"💪","אור - תזונה ובריאות":"🥗","Noga - Yoga & Mindfulness":"🧘",
+  "Tanya - Gym & Gains":"🏋️","Darius - Run & Recovery":"🏃","Alicia - Wellness & Self-Care":"🌿",
+  "Phoebe - Fitness UK":"💪","Caleb - Strength UK":"🏋️","Fatima - Wellness UK":"🧘",
+  "Mia - Fitness & Sport":"⚡","Henrik - Training & Health":"🏃","Carla - Yoga & Achtsamkeit":"🧘",
+  // v2.15.0: Books
+  "נועם - ספרים וספרות":"📖","רינת - חינוך וטכנולוגיה":"🎓","Tal - Philosophy & Ideas":"💭",
+  "Harper - BookTok":"📱","Elijah - Sci-Fi & Fantasy Reads":"🐉","Nina - Non-Fiction & Essays":"📝",
+  "Matilda - Literary UK":"📚","Aiden - EdTech UK":"🎓","Imogen - Poetry & Prose UK":"✍️",
+  "Johanna - Bücher & Lesen":"📖","Florian - Bildung & Wissen":"🎓","Lina - Literatur & Kultur":"📚",
+  // v2.15.0: Cars
+  "איתי - רכב וטכנולוגיה":"🚗","מיכאל - חשמליות ו-EV":"🔌","Lior - Car Tech IL":"🤖",
+  "Brayden - Muscle & Horsepower":"🏎️","Courtney - EV & Green Drive":"⚡","Jalen - Truck & Off-Road":"🛻",
+  "George - Top Gear Fan":"🏁","Harry - F1 & Motorsport UK":"🏎️","Zoe - Car Reviews UK":"🚙",
+  "Nico - Autos & Tuning":"🔧","Kai - Elektro & Mobilität":"⚡","Timo - Oldtimer & Klassiker":"🏛️",
+  // v2.15.0: Pets
+  "שי - כלבים וחתולים":"🐕","תהילה - אימוץ וחילוץ":"❤️","Amit - Animals & Nature IL":"🦁",
+  "Bella - Dog Mom":"🐶","Miles - Exotic Pets":"🦎","Savannah - Cat Lady Life":"🐱",
+  "Lucy - Pet Life UK":"🐾","Alfie - Vet & Advice UK":"🩺","Ellie - Wildlife UK":"🦔",
+  "Maren - Haustiere & Liebe":"🐕","Jana - Tierrettung & Pflege":"🏥","Felix - Hunde & Natur":"🌲",
+  // v2.15.0: Science
+  "עמית - מדע וחלל":"🔭","הילה - ביוטק ורפואה":"🧬","Yonatan - AI & Research IL":"🤖",
+  "Maya - Space & Astro":"🌌","Theo - Climate & Earth":"🌍","Zane - Quantum & Physics":"⚛️",
+  "Raj - Science UK":"🔬","Sienna - BioTech UK":"🧬","Owen - Science Explainer UK":"🧪",
+  "Nils - Forschung & Wissen":"🔬","Clara - Klima & Umwelt":"🌱","Luisa - Medizin & Forschung":"💊"
+};
+// DiceBear avatar URLs for all 55 personas
+const PAVATAR = {
+  // 🇮🇱 Israel
+  "Dana - Tech Observer":"https://api.dicebear.com/7.x/avataaars/svg?seed=Dana&backgroundColor=b6e3f4",
+  "יוסי - פרשן חדשות":"https://api.dicebear.com/7.x/avataaars/svg?seed=Yossi&backgroundColor=ffd5dc",
+  "Rotem 😂":"https://api.dicebear.com/7.x/avataaars/svg?seed=Rotem&backgroundColor=fef3c7",
+  "Maya - Global View":"https://api.dicebear.com/7.x/avataaars/svg?seed=Maya&backgroundColor=d1fae5",
+  "Alex - Deep Tech":"https://api.dicebear.com/7.x/avataaars/svg?seed=AlexDT&backgroundColor=ede9fe",
+  // 🇬🇧 UK
+  "James - Westminster Watch":"https://api.dicebear.com/7.x/avataaars/svg?seed=James&backgroundColor=dbeafe",
+  "Priya - London Life":"https://api.dicebear.com/7.x/avataaars/svg?seed=PriyaLDN&backgroundColor=fce7f3",
+  "Oliver - Tech & Science UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver&backgroundColor=ccfbf1",
+  "Fiona - Football & Culture":"https://api.dicebear.com/7.x/avataaars/svg?seed=Fiona&backgroundColor=ffedd5",
+  "Tariq - Global Brit":"https://api.dicebear.com/7.x/avataaars/svg?seed=Tariq&backgroundColor=f1f5f9",
+  // 🇺🇸 USA
+  "Mike - Capitol Hill":"https://api.dicebear.com/7.x/avataaars/svg?seed=Mike&backgroundColor=fee2e2",
+  "Sarah - Silicon Valley":"https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah&backgroundColor=ede9fe",
+  "DeShawn - Culture & Sports":"https://api.dicebear.com/7.x/avataaars/svg?seed=DeShawn&backgroundColor=ffedd5",
+  "Elena - NYC Life":"https://api.dicebear.com/7.x/avataaars/svg?seed=Elena&backgroundColor=cffafe",
+  "Chris - Science & Space":"https://api.dicebear.com/7.x/avataaars/svg?seed=Chris&backgroundColor=d1fae5",
+  // 🇩🇪 Germany
+  "Klaus - Berliner Politik":"https://api.dicebear.com/7.x/avataaars/svg?seed=Klaus&backgroundColor=dbeafe",
+  "Lena - Tech & Wissenschaft":"https://api.dicebear.com/7.x/avataaars/svg?seed=Lena&backgroundColor=f3e8ff",
+  "Mehmet - Fußball & Kultur":"https://api.dicebear.com/7.x/avataaars/svg?seed=MehmetDE&backgroundColor=fef3c7",
+  "Sophie - Wirtschaft":"https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie&backgroundColor=ccfbf1",
+  "Nico - Alltag & Meinung":"https://api.dicebear.com/7.x/avataaars/svg?seed=Nico&backgroundColor=fce7f3",
+  // 🇫🇷 France
+  "Pierre - Politique & Débat":"https://api.dicebear.com/7.x/avataaars/svg?seed=Pierre&backgroundColor=dbeafe",
+  "Camille - Tech & Innovation":"https://api.dicebear.com/7.x/avataaars/svg?seed=Camille&backgroundColor=f3e8ff",
+  "Yasmine - Culture & Société":"https://api.dicebear.com/7.x/avataaars/svg?seed=Yasmine&backgroundColor=ffedd5",
+  "Lucas - Sport & Divertissement":"https://api.dicebear.com/7.x/avataaars/svg?seed=Lucas&backgroundColor=ccfbf1",
+  "Margot - Économie & Quotidien":"https://api.dicebear.com/7.x/avataaars/svg?seed=Margot&backgroundColor=fae8ff",
+  // 🇪🇸 Spain
+  "Carlos - Política y Sociedad":"https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos&backgroundColor=fee2e2",
+  "Lucía - Tech e Innovación":"https://api.dicebear.com/7.x/avataaars/svg?seed=Lucia&backgroundColor=ede9fe",
+  "Javier - Fútbol y Deportes":"https://api.dicebear.com/7.x/avataaars/svg?seed=Javier&backgroundColor=fef3c7",
+  "María - Cultura y Vida":"https://api.dicebear.com/7.x/avataaars/svg?seed=Maria&backgroundColor=fce7f3",
+  "Ahmed - Economía y Debate":"https://api.dicebear.com/7.x/avataaars/svg?seed=AhmedES&backgroundColor=d1fae5",
+  // 🇮🇹 Italy
+  "Marco - Politica e Società":"https://api.dicebear.com/7.x/avataaars/svg?seed=Marco&backgroundColor=fce7f3",
+  "Giulia - Tech & Innovazione":"https://api.dicebear.com/7.x/avataaars/svg?seed=Giulia&backgroundColor=eef2ff",
+  "Alessandro - Calcio e Sport":"https://api.dicebear.com/7.x/avataaars/svg?seed=Alessandro&backgroundColor=fef3c7",
+  "Valentina - Cultura e Lifestyle":"https://api.dicebear.com/7.x/avataaars/svg?seed=Valentina&backgroundColor=fce7f3",
+  "Hassan - Economia e Lavoro":"https://api.dicebear.com/7.x/avataaars/svg?seed=HassanIT&backgroundColor=cffafe",
+  // 🇧🇷 Brazil
+  "Rafael - Política e Sociedade":"https://api.dicebear.com/7.x/avataaars/svg?seed=Rafael&backgroundColor=d1fae5",
+  "Fernanda - Tech & Inovação":"https://api.dicebear.com/7.x/avataaars/svg?seed=Fernanda&backgroundColor=ede9fe",
+  "Thiago - Futebol e Esportes":"https://api.dicebear.com/7.x/avataaars/svg?seed=Thiago&backgroundColor=fef3c7",
+  "Camila - Cultura e Vida":"https://api.dicebear.com/7.x/avataaars/svg?seed=CamilaBR&backgroundColor=fce7f3",
+  "João - Economia e Debate":"https://api.dicebear.com/7.x/avataaars/svg?seed=Joao&backgroundColor=dbeafe",
+  // 🇯🇵 Japan
+  "Takeshi - 政治 & 社会":"https://api.dicebear.com/7.x/avataaars/svg?seed=Takeshi&backgroundColor=fee2e2",
+  "Haruka - Tech & イノベーション":"https://api.dicebear.com/7.x/avataaars/svg?seed=Haruka&backgroundColor=ede9fe",
+  "Yuki - アニメ & ポップカルチャー":"https://api.dicebear.com/7.x/avataaars/svg?seed=Yuki&backgroundColor=fef3c7",
+  "Kenji - スポーツ & エンタメ":"https://api.dicebear.com/7.x/avataaars/svg?seed=Kenji&backgroundColor=dbeafe",
+  "Aiko - 経済 & ビジネス":"https://api.dicebear.com/7.x/avataaars/svg?seed=Aiko&backgroundColor=d1fae5",
+  // 🇹🇷 Turkey
+  "Mehmet Ali - Siyaset & Toplum":"https://api.dicebear.com/7.x/avataaars/svg?seed=MehmetAli&backgroundColor=fee2e2",
+  "Zeynep - Teknoloji & Bilim":"https://api.dicebear.com/7.x/avataaars/svg?seed=Zeynep&backgroundColor=f3e8ff",
+  "Emre - Futbol & Spor":"https://api.dicebear.com/7.x/avataaars/svg?seed=Emre&backgroundColor=fef3c7",
+  "Elif - Kültür & Yaşam":"https://api.dicebear.com/7.x/avataaars/svg?seed=Elif&backgroundColor=fce7f3",
+  "Burak - Ekonomi & Tartışma":"https://api.dicebear.com/7.x/avataaars/svg?seed=Burak&backgroundColor=ccfbf1",
+  // 🇮🇳 India
+  "Vikram - Politics & Society":"https://api.dicebear.com/7.x/avataaars/svg?seed=Vikram&backgroundColor=fce7f3",
+  "Neha - Tech & Startups":"https://api.dicebear.com/7.x/avataaars/svg?seed=Neha&backgroundColor=ede9fe",
+  "Arjun - Cricket & Sports":"https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun&backgroundColor=fef3c7",
+  "Priya - Bollywood & Culture":"https://api.dicebear.com/7.x/avataaars/svg?seed=PriyaIN&backgroundColor=fce7f3",
+  "Amit - Economy & Business":"https://api.dicebear.com/7.x/avataaars/svg?seed=Amit&backgroundColor=d1fae5",
+  // v2.14.0: Lifestyle Personas
+  "שירה - אופנה ישראלית":"https://api.dicebear.com/7.x/avataaars/svg?seed=Shira&backgroundColor=fce7f3",
+  "נועה - סטייל וטרנדים":"https://api.dicebear.com/7.x/avataaars/svg?seed=NoaStyle&backgroundColor=fce7f3",
+  "Aviv - Street Style IL":"https://api.dicebear.com/7.x/avataaars/svg?seed=AvivSt&backgroundColor=f3e8ff",
+  "ליאור - ביוטי וטיפוח":"https://api.dicebear.com/7.x/avataaars/svg?seed=LiorB&backgroundColor=fce7f3",
+  "תמר - איפור וסטייל":"https://api.dicebear.com/7.x/avataaars/svg?seed=TamarM&backgroundColor=fce7f3",
+  "Inbal - Beauty Blog IL":"https://api.dicebear.com/7.x/avataaars/svg?seed=InbalB&backgroundColor=fce7f3",
+  "אלון - מוזיקה ותרבות":"https://api.dicebear.com/7.x/avataaars/svg?seed=AlonM&backgroundColor=ede9fe",
+  "מיכל - פופ ומיינסטרים":"https://api.dicebear.com/7.x/avataaars/svg?seed=MichalP&backgroundColor=ede9fe",
+  "Itai - Indie & Alt IL":"https://api.dicebear.com/7.x/avataaars/svg?seed=ItaiI&backgroundColor=ede9fe",
+  "Gemma - London Fashion":"https://api.dicebear.com/7.x/avataaars/svg?seed=GemmaF&backgroundColor=fce7f3",
+  "Poppy - Style & Trends UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=PoppyS&backgroundColor=fce7f3",
+  "Aisha - Runway & Street UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=AishaR&backgroundColor=fce7f3",
+  "Charlotte - Beauty Edit UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=CharlotteB&backgroundColor=fce7f3",
+  "Grace - Skincare Diaries":"https://api.dicebear.com/7.x/avataaars/svg?seed=GraceS&backgroundColor=fce7f3",
+  "Zara - Makeup & Glam UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=ZaraG&backgroundColor=fce7f3",
+  "Liam - British Sound":"https://api.dicebear.com/7.x/avataaars/svg?seed=LiamBS&backgroundColor=ede9fe",
+  "Freya - Indie & Alt UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=FreyaI&backgroundColor=ede9fe",
+  "Idris - UK Music Scene":"https://api.dicebear.com/7.x/avataaars/svg?seed=IdrisM&backgroundColor=ede9fe",
+  "Ava - NYC Style":"https://api.dicebear.com/7.x/avataaars/svg?seed=AvaNYC&backgroundColor=fce7f3",
+  "Jordan - Fashion Forward":"https://api.dicebear.com/7.x/avataaars/svg?seed=JordanFF&backgroundColor=fce7f3",
+  "Mia - Runway Insider":"https://api.dicebear.com/7.x/avataaars/svg?seed=MiaRI&backgroundColor=fce7f3",
+  "Taylor - Beauty Editor":"https://api.dicebear.com/7.x/avataaars/svg?seed=TaylorBE&backgroundColor=fce7f3",
+  "Zoe - Skincare & Glow":"https://api.dicebear.com/7.x/avataaars/svg?seed=ZoeSG&backgroundColor=fce7f3",
+  "Jade - Makeup Maven":"https://api.dicebear.com/7.x/avataaars/svg?seed=JadeMM&backgroundColor=fce7f3",
+  "Marcus - Music Critic":"https://api.dicebear.com/7.x/avataaars/svg?seed=MarcusMC&backgroundColor=ede9fe",
+  "Aaliyah - Sound & Culture":"https://api.dicebear.com/7.x/avataaars/svg?seed=AaliyahSC&backgroundColor=ede9fe",
+  "Ryan - Indie Sounds":"https://api.dicebear.com/7.x/avataaars/svg?seed=RyanIS&backgroundColor=ede9fe",
+  "Anna - Mode & Stil":"https://api.dicebear.com/7.x/avataaars/svg?seed=AnnaMS&backgroundColor=fce7f3",
+  "Lea - Fashion Berlin":"https://api.dicebear.com/7.x/avataaars/svg?seed=LeaFB&backgroundColor=fce7f3",
+  "Maren - Streetwear DE":"https://api.dicebear.com/7.x/avataaars/svg?seed=MarenSW&backgroundColor=fce7f3",
+  "Lisa - Beauty & Pflege":"https://api.dicebear.com/7.x/avataaars/svg?seed=LisaBP&backgroundColor=fce7f3",
+  "Jana - Makeup Trends DE":"https://api.dicebear.com/7.x/avataaars/svg?seed=JanaMT&backgroundColor=fce7f3",
+  "Nadia - Skincare Expertin":"https://api.dicebear.com/7.x/avataaars/svg?seed=NadiaSE&backgroundColor=fce7f3",
+  "Felix - Musikszene DE":"https://api.dicebear.com/7.x/avataaars/svg?seed=FelixMD&backgroundColor=ede9fe",
+  "Mila - Pop & Kultur DE":"https://api.dicebear.com/7.x/avataaars/svg?seed=MilaPK&backgroundColor=ede9fe",
+  "Tim - Indie & Alternative DE":"https://api.dicebear.com/7.x/avataaars/svg?seed=TimIA&backgroundColor=ede9fe",
+  // v2.14.0: Food
+  "דנה - פוד בלוגרית":"https://api.dicebear.com/7.x/avataaars/svg?seed=DanaFood&backgroundColor=fed7aa",
+  "עומר - שף ביתי":"https://api.dicebear.com/7.x/avataaars/svg?seed=OmerChef&backgroundColor=fef3c7",
+  "Noa - Vegan IL":"https://api.dicebear.com/7.x/avataaars/svg?seed=NoaVegan&backgroundColor=d9f99d",
+  "Brooklyn Bites - NYC Food":"https://api.dicebear.com/7.x/avataaars/svg?seed=BrooklynBites&backgroundColor=fed7aa",
+  "Maria - Farm to Table":"https://api.dicebear.com/7.x/avataaars/svg?seed=MariaFarm&backgroundColor=fef9c3",
+  "Jake - BBQ & Comfort":"https://api.dicebear.com/7.x/avataaars/svg?seed=JakeBBQ&backgroundColor=fecaca",
+  "Ollie - London Eats":"https://api.dicebear.com/7.x/avataaars/svg?seed=OllieLondon&backgroundColor=fed7aa",
+  "Preet - UK Food Critic":"https://api.dicebear.com/7.x/avataaars/svg?seed=PreetFood&backgroundColor=fef3c7",
+  "Hana - Baking & Brunch UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=HanaBake&backgroundColor=fce7f3",
+  "Lara - Foodie Berlin":"https://api.dicebear.com/7.x/avataaars/svg?seed=LaraFoodie&backgroundColor=fed7aa",
+  "Sven - Küche & Genuss":"https://api.dicebear.com/7.x/avataaars/svg?seed=SvenKuche&backgroundColor=fef3c7",
+  "Yuki - Street Food DE":"https://api.dicebear.com/7.x/avataaars/svg?seed=YukiStreet&backgroundColor=fef9c3",
+  // v2.14.0: Gaming
+  "גיא - גיימר ישראלי":"https://api.dicebear.com/7.x/avataaars/svg?seed=GuyGamer&backgroundColor=bbf7d0",
+  "ליאם - אינדי גיימינג":"https://api.dicebear.com/7.x/avataaars/svg?seed=LiamIndie&backgroundColor=d9f99d",
+  "Shira - Mobile & Casual":"https://api.dicebear.com/7.x/avataaars/svg?seed=ShiraMobile&backgroundColor=e0e7ff",
+  "Tyler - FPS & Esports":"https://api.dicebear.com/7.x/avataaars/svg?seed=TylerFPS&backgroundColor=bbf7d0",
+  "Destiny - RPG & Story":"https://api.dicebear.com/7.x/avataaars/svg?seed=DestinyRPG&backgroundColor=ddd6fe",
+  "Alex - Tech & Hardware":"https://api.dicebear.com/7.x/avataaars/svg?seed=AlexHW&backgroundColor=bfdbfe",
+  "Callum - PC Gaming UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=CallumPC&backgroundColor=bbf7d0",
+  "Sophie - Indie Games UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=SophieIndie&backgroundColor=d9f99d",
+  "Rhys - Console & PS UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=RhysPS&backgroundColor=bfdbfe",
+  "Max - Zocken & Reviews":"https://api.dicebear.com/7.x/avataaars/svg?seed=MaxZocken&backgroundColor=bbf7d0",
+  "Finn - Retro & Indie DE":"https://api.dicebear.com/7.x/avataaars/svg?seed=FinnRetro&backgroundColor=fef9c3",
+  "Lena - Gaming & Streaming":"https://api.dicebear.com/7.x/avataaars/svg?seed=LenaStream&backgroundColor=ddd6de",
+  // v2.14.0: Film & TV
+  "רון - קולנוע וטלוויזיה":"https://api.dicebear.com/7.x/avataaars/svg?seed=RonFilm&backgroundColor=cffafe",
+  "מאיה - סדרות ודרמה":"https://api.dicebear.com/7.x/avataaars/svg?seed=MayaTV&backgroundColor=e0e7ff",
+  "Yael - Documentary & Art":"https://api.dicebear.com/7.x/avataaars/svg?seed=YaelDoc&backgroundColor=f5f5f4",
+  "Jasmine - Hollywood Insider":"https://api.dicebear.com/7.x/avataaars/svg?seed=JasmineHW&backgroundColor=cffafe",
+  "Devon - Streaming & Binge":"https://api.dicebear.com/7.x/avataaars/svg?seed=DevonStream&backgroundColor=ddd6fe",
+  "Carlos - Horror & Sci-Fi":"https://api.dicebear.com/7.x/avataaars/svg?seed=CarlosHorror&backgroundColor=1e293b",
+  "Alfie - British Cinema":"https://api.dicebear.com/7.x/avataaars/svg?seed=AlfieCinema&backgroundColor=cffafe",
+  "Rosie - TV & Drama UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=RosieDrama&backgroundColor=fce7f3",
+  "Ethan - Sci-Fi & Fantasy UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=EthanSciFi&backgroundColor=bfdbfe",
+  "Lukas - Film & Serien":"https://api.dicebear.com/7.x/avataaars/svg?seed=LukasFilm&backgroundColor=cffafe",
+  "Nina - Kino & Kritik":"https://api.dicebear.com/7.x/avataaars/svg?seed=NinaKino&backgroundColor=e0e7ff",
+  "Amir - Popkultur & Film":"https://api.dicebear.com/7.x/avataaars/svg?seed=AmirPop&backgroundColor=fef9c3",
+  // v2.15.0: Finance
+  "גלעד - שוק ההון":"https://api.dicebear.com/7.x/avataaars/svg?seed=GiladStock&backgroundColor=fef9c3",
+  "שרון - קריפטו ובלוקצ'יין":"https://api.dicebear.com/7.x/avataaars/svg?seed=SharonCrypto&backgroundColor=fef3c7",
+  "Eran - Startups & VC":"https://api.dicebear.com/7.x/avataaars/svg?seed=EranVC&backgroundColor=e0e7ff",
+  "Marcus - Wall Street":"https://api.dicebear.com/7.x/avataaars/svg?seed=MarcusWS&backgroundColor=fef9c3",
+  "Kayla - Crypto & DeFi":"https://api.dicebear.com/7.x/avataaars/svg?seed=KaylaDeFi&backgroundColor=fef3c7",
+  "Derek - Personal Finance":"https://api.dicebear.com/7.x/avataaars/svg?seed=DerekPF&backgroundColor=d9f99d",
+  "Oliver - City Finance":"https://api.dicebear.com/7.x/avataaars/svg?seed=OliverCity&backgroundColor=fef9c3",
+  "Amara - Fintech UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=AmaraFT&backgroundColor=e0e7ff",
+  "Rishi - UK Economy":"https://api.dicebear.com/7.x/avataaars/svg?seed=RishiEcon&backgroundColor=fef3c7",
+  "Stefan - Börse & Finanzen":"https://api.dicebear.com/7.x/avataaars/svg?seed=StefanBorse&backgroundColor=fef9c3",
+  "Julia - Krypto & Blockchain":"https://api.dicebear.com/7.x/avataaars/svg?seed=JuliaKrypto&backgroundColor=fef3c7",
+  "Moritz - Wirtschaft & Geld":"https://api.dicebear.com/7.x/avataaars/svg?seed=MoritzWirt&backgroundColor=d9f99d",
+  // v2.15.0: Travel
+  "דניאל - טייל בעולם":"https://api.dicebear.com/7.x/avataaars/svg?seed=DanielTravel&backgroundColor=bae6fd",
+  "ענת - טיולים משפחתיים":"https://api.dicebear.com/7.x/avataaars/svg?seed=AnatFamily&backgroundColor=fce7f3",
+  "Ori - Digital Nomad IL":"https://api.dicebear.com/7.x/avataaars/svg?seed=OriNomad&backgroundColor=e0e7ff",
+  "Megan - Wanderlust":"https://api.dicebear.com/7.x/avataaars/svg?seed=MeganWander&backgroundColor=bae6fd",
+  "Jordan - Budget Travel":"https://api.dicebear.com/7.x/avataaars/svg?seed=JordanBudget&backgroundColor=d9f99d",
+  "Samantha - Luxury Travel":"https://api.dicebear.com/7.x/avataaars/svg?seed=SamLuxury&backgroundColor=fef3c7",
+  "Chloe - Travel UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=ChloeTravel&backgroundColor=bae6fd",
+  "Kwame - Adventure UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=KwameAdv&backgroundColor=bbf7d0",
+  "Isla - Solo Travel UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=IslaSolo&backgroundColor=e0e7ff",
+  "Annika - Reisen & Abenteuer":"https://api.dicebear.com/7.x/avataaars/svg?seed=AnnikaReise&backgroundColor=bae6fd",
+  "Tobias - Backpacking DE":"https://api.dicebear.com/7.x/avataaars/svg?seed=TobiasBP&backgroundColor=d9f99d",
+  "Leonie - Fernweh & Reise":"https://api.dicebear.com/7.x/avataaars/svg?seed=LeonieFern&backgroundColor=fce7f3",
+  // v2.15.0: Fitness
+  "יעל - כושר ואימונים":"https://api.dicebear.com/7.x/avataaars/svg?seed=YaelFit&backgroundColor=fecdd3",
+  "אור - תזונה ובריאות":"https://api.dicebear.com/7.x/avataaars/svg?seed=OrNutrition&backgroundColor=d9f99d",
+  "Noga - Yoga & Mindfulness":"https://api.dicebear.com/7.x/avataaars/svg?seed=NogaYoga&backgroundColor=e0e7ff",
+  "Tanya - Gym & Gains":"https://api.dicebear.com/7.x/avataaars/svg?seed=TanyaGym&backgroundColor=fecdd3",
+  "Darius - Run & Recovery":"https://api.dicebear.com/7.x/avataaars/svg?seed=DariusRun&backgroundColor=bbf7d0",
+  "Alicia - Wellness & Self-Care":"https://api.dicebear.com/7.x/avataaars/svg?seed=AliciaWell&backgroundColor=fce7f3",
+  "Phoebe - Fitness UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=PhoebeFit&backgroundColor=fecdd3",
+  "Caleb - Strength UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=CalebStr&backgroundColor=fed7aa",
+  "Fatima - Wellness UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=FatimaWell&backgroundColor=e0e7ff",
+  "Mia - Fitness & Sport":"https://api.dicebear.com/7.x/avataaars/svg?seed=MiaFitSport&backgroundColor=fecdd3",
+  "Henrik - Training & Health":"https://api.dicebear.com/7.x/avataaars/svg?seed=HenrikTrain&backgroundColor=bbf7d0",
+  "Carla - Yoga & Achtsamkeit":"https://api.dicebear.com/7.x/avataaars/svg?seed=CarlaYoga&backgroundColor=e0e7ff",
+  // v2.15.0: Books
+  "נועם - ספרים וספרות":"https://api.dicebear.com/7.x/avataaars/svg?seed=NoamBooks&backgroundColor=ddd6fe",
+  "רינת - חינוך וטכנולוגיה":"https://api.dicebear.com/7.x/avataaars/svg?seed=RinatEdu&backgroundColor=e0e7ff",
+  "Tal - Philosophy & Ideas":"https://api.dicebear.com/7.x/avataaars/svg?seed=TalPhilo&backgroundColor=f5f5f4",
+  "Harper - BookTok":"https://api.dicebear.com/7.x/avataaars/svg?seed=HarperBT&backgroundColor=fce7f3",
+  "Elijah - Sci-Fi & Fantasy Reads":"https://api.dicebear.com/7.x/avataaars/svg?seed=ElijahSF&backgroundColor=bfdbfe",
+  "Nina - Non-Fiction & Essays":"https://api.dicebear.com/7.x/avataaars/svg?seed=NinaNF&backgroundColor=f5f5f4",
+  "Matilda - Literary UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=MatildaLit&backgroundColor=ddd6fe",
+  "Aiden - EdTech UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=AidenET&backgroundColor=bfdbfe",
+  "Imogen - Poetry & Prose UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=ImogenPoet&backgroundColor=fce7f3",
+  "Johanna - Bücher & Lesen":"https://api.dicebear.com/7.x/avataaars/svg?seed=JohannaBook&backgroundColor=ddd6fe",
+  "Florian - Bildung & Wissen":"https://api.dicebear.com/7.x/avataaars/svg?seed=FlorianBild&backgroundColor=e0e7ff",
+  "Lina - Literatur & Kultur":"https://api.dicebear.com/7.x/avataaars/svg?seed=LinaLit&backgroundColor=ddd6fe",
+  // v2.15.0: Cars
+  "איתי - רכב וטכנולוגיה":"https://api.dicebear.com/7.x/avataaars/svg?seed=ItaiCar&backgroundColor=e2e8f0",
+  "מיכאל - חשמליות ו-EV":"https://api.dicebear.com/7.x/avataaars/svg?seed=MichaelEV&backgroundColor=bbf7d0",
+  "Lior - Car Tech IL":"https://api.dicebear.com/7.x/avataaars/svg?seed=LiorCarTech&backgroundColor=bfdbfe",
+  "Brayden - Muscle & Horsepower":"https://api.dicebear.com/7.x/avataaars/svg?seed=BraydenHP&backgroundColor=fecaca",
+  "Courtney - EV & Green Drive":"https://api.dicebear.com/7.x/avataaars/svg?seed=CourtneyEV&backgroundColor=bbf7d0",
+  "Jalen - Truck & Off-Road":"https://api.dicebear.com/7.x/avataaars/svg?seed=JalenTruck&backgroundColor=fed7aa",
+  "George - Top Gear Fan":"https://api.dicebear.com/7.x/avataaars/svg?seed=GeorgeTG&backgroundColor=e2e8f0",
+  "Harry - F1 & Motorsport UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=HarryF1&backgroundColor=fecaca",
+  "Zoe - Car Reviews UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=ZoeCars&backgroundColor=bfdbfe",
+  "Nico - Autos & Tuning":"https://api.dicebear.com/7.x/avataaars/svg?seed=NicoAutos&backgroundColor=e2e8f0",
+  "Kai - Elektro & Mobilität":"https://api.dicebear.com/7.x/avataaars/svg?seed=KaiElektro&backgroundColor=bbf7d0",
+  "Timo - Oldtimer & Klassiker":"https://api.dicebear.com/7.x/avataaars/svg?seed=TimoOldtimer&backgroundColor=fef9c3",
+  // v2.15.0: Pets
+  "שי - כלבים וחתולים":"https://api.dicebear.com/7.x/avataaars/svg?seed=ShaiPets&backgroundColor=fed7aa",
+  "תהילה - אימוץ וחילוץ":"https://api.dicebear.com/7.x/avataaars/svg?seed=TehilaAdopt&backgroundColor=fecdd3",
+  "Amit - Animals & Nature IL":"https://api.dicebear.com/7.x/avataaars/svg?seed=AmitAnimals&backgroundColor=bbf7d0",
+  "Bella - Dog Mom":"https://api.dicebear.com/7.x/avataaars/svg?seed=BellaDog&backgroundColor=fed7aa",
+  "Miles - Exotic Pets":"https://api.dicebear.com/7.x/avataaars/svg?seed=MilesExotic&backgroundColor=bbf7d0",
+  "Savannah - Cat Lady Life":"https://api.dicebear.com/7.x/avataaars/svg?seed=SavannahCat&backgroundColor=fce7f3",
+  "Lucy - Pet Life UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=LucyPet&backgroundColor=fed7aa",
+  "Alfie - Vet & Advice UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=AlfieVet&backgroundColor=bfdbfe",
+  "Ellie - Wildlife UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=EllieWild&backgroundColor=bbf7d0",
+  "Maren - Haustiere & Liebe":"https://api.dicebear.com/7.x/avataaars/svg?seed=MarenPets&backgroundColor=fed7aa",
+  "Jana - Tierrettung & Pflege":"https://api.dicebear.com/7.x/avataaars/svg?seed=JanaTier&backgroundColor=fecdd3",
+  "Felix - Hunde & Natur":"https://api.dicebear.com/7.x/avataaars/svg?seed=FelixHunde&backgroundColor=bbf7d0",
+  // v2.15.0: Science
+  "עמית - מדע וחלל":"https://api.dicebear.com/7.x/avataaars/svg?seed=AmitSpace&backgroundColor=ccfbf1",
+  "הילה - ביוטק ורפואה":"https://api.dicebear.com/7.x/avataaars/svg?seed=HilaBiotech&backgroundColor=e0e7ff",
+  "Yonatan - AI & Research IL":"https://api.dicebear.com/7.x/avataaars/svg?seed=YonatanAI&backgroundColor=bfdbfe",
+  "Maya - Space & Astro":"https://api.dicebear.com/7.x/avataaars/svg?seed=MayaSpace&backgroundColor=1e293b",
+  "Theo - Climate & Earth":"https://api.dicebear.com/7.x/avataaars/svg?seed=TheoClimate&backgroundColor=bbf7d0",
+  "Zane - Quantum & Physics":"https://api.dicebear.com/7.x/avataaars/svg?seed=ZaneQuantum&backgroundColor=e0e7ff",
+  "Raj - Science UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=RajScience&backgroundColor=ccfbf1",
+  "Sienna - BioTech UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=SiennaBio&backgroundColor=e0e7ff",
+  "Owen - Science Explainer UK":"https://api.dicebear.com/7.x/avataaars/svg?seed=OwenExplain&backgroundColor=fef9c3",
+  "Nils - Forschung & Wissen":"https://api.dicebear.com/7.x/avataaars/svg?seed=NilsForsch&backgroundColor=ccfbf1",
+  "Clara - Klima & Umwelt":"https://api.dicebear.com/7.x/avataaars/svg?seed=ClaraKlima&backgroundColor=bbf7d0",
+  "Luisa - Medizin & Forschung":"https://api.dicebear.com/7.x/avataaars/svg?seed=LuisaMed&backgroundColor=e0e7ff"
+};
+// Persona → Vertical mapping
+const PVERTICAL = {
+  // Original personas — News/Politics
+  "Dana - Tech Observer":"tech","יוסי - פרשן חדשות":"news","Rotem 😂":"general",
+  "Maya - Global View":"news","Alex - Deep Tech":"tech",
+  "James - Westminster Watch":"news","Priya - London Life":"general",
+  "Oliver - Tech & Science UK":"tech","Fiona - Football & Culture":"sports",
+  "Tariq - Global Brit":"news",
+  "Mike - Capitol Hill":"news","Sarah - Silicon Valley":"tech",
+  "DeShawn - Culture & Sports":"sports","Elena - NYC Life":"general",
+  "Chris - Science & Space":"tech",
+  "Klaus - Berliner Politik":"news","Lena - Tech & Wissenschaft":"tech",
+  "Mehmet - Fußball & Kultur":"sports","Sophie - Wirtschaft":"news",
+  "Nico - Alltag & Meinung":"general",
+  "Pierre - Politique & Débat":"news","Camille - Tech & Innovation":"tech",
+  "Yasmine - Culture & Société":"general","Lucas - Sport & Divertissement":"sports",
+  "Margot - Économie & Quotidien":"news",
+  "Carlos - Política y Sociedad":"news","Lucía - Tech e Innovación":"tech",
+  "Javier - Fútbol y Deportes":"sports","María - Cultura y Vida":"general",
+  "Ahmed - Economía y Debate":"news",
+  "Marco - Politica e Società":"news","Giulia - Tech & Innovazione":"tech",
+  "Alessandro - Calcio e Sport":"sports","Valentina - Cultura e Lifestyle":"general",
+  "Hassan - Economia e Lavoro":"news",
+  "Rafael - Política e Sociedade":"news","Fernanda - Tech & Inovação":"tech",
+  "Thiago - Futebol e Esportes":"sports","Camila - Cultura e Vida":"general",
+  "João - Economia e Debate":"news",
+  "Takeshi - 政治 & 社会":"news","Haruka - Tech & イノベーション":"tech",
+  "Yuki - アニメ & ポップカルチャー":"general","Kenji - スポーツ & エンタメ":"sports",
+  "Aiko - 経済 & ビジネス":"news",
+  "Mehmet Ali - Siyaset & Toplum":"news","Zeynep - Teknoloji & Bilim":"tech",
+  "Emre - Futbol & Spor":"sports","Elif - Kültür & Yaşam":"general",
+  "Burak - Ekonomi & Tartışma":"news",
+  "Vikram - Politics & Society":"news","Neha - Tech & Startups":"tech",
+  "Arjun - Cricket & Sports":"sports","Priya - Bollywood & Culture":"general",
+  "Amit - Economy & Business":"news",
+  // v2.14.0: Lifestyle
+  "שירה - אופנה ישראלית":"fashion","נועה - סטייל וטרנדים":"fashion","Aviv - Street Style IL":"fashion",
+  "ליאור - ביוטי וטיפוח":"beauty","תמר - איפור וסטייל":"beauty","Inbal - Beauty Blog IL":"beauty",
+  "אלון - מוזיקה ותרבות":"music","מיכל - פופ ומיינסטרים":"music","Itai - Indie & Alt IL":"music",
+  "Gemma - London Fashion":"fashion","Poppy - Style & Trends UK":"fashion","Aisha - Runway & Street UK":"fashion",
+  "Charlotte - Beauty Edit UK":"beauty","Grace - Skincare Diaries":"beauty","Zara - Makeup & Glam UK":"beauty",
+  "Liam - British Sound":"music","Freya - Indie & Alt UK":"music","Idris - UK Music Scene":"music",
+  "Ava - NYC Style":"fashion","Jordan - Fashion Forward":"fashion","Mia - Runway Insider":"fashion",
+  "Taylor - Beauty Editor":"beauty","Zoe - Skincare & Glow":"beauty","Jade - Makeup Maven":"beauty",
+  "Marcus - Music Critic":"music","Aaliyah - Sound & Culture":"music","Ryan - Indie Sounds":"music",
+  "Anna - Mode & Stil":"fashion","Lea - Fashion Berlin":"fashion","Maren - Streetwear DE":"fashion",
+  "Lisa - Beauty & Pflege":"beauty","Jana - Makeup Trends DE":"beauty","Nadia - Skincare Expertin":"beauty",
+  "Felix - Musikszene DE":"music","Mila - Pop & Kultur DE":"music","Tim - Indie & Alternative DE":"music",
+  // v2.14.0: Food
+  "דנה - פוד בלוגרית":"food","עומר - שף ביתי":"food","Noa - Vegan IL":"food",
+  "Brooklyn Bites - NYC Food":"food","Maria - Farm to Table":"food","Jake - BBQ & Comfort":"food",
+  "Ollie - London Eats":"food","Preet - UK Food Critic":"food","Hana - Baking & Brunch UK":"food",
+  "Lara - Foodie Berlin":"food","Sven - Küche & Genuss":"food","Yuki - Street Food DE":"food",
+  // v2.14.0: Gaming
+  "גיא - גיימר ישראלי":"gaming","ליאם - אינדי גיימינג":"gaming","Shira - Mobile & Casual":"gaming",
+  "Tyler - FPS & Esports":"gaming","Destiny - RPG & Story":"gaming","Alex - Tech & Hardware":"gaming",
+  "Callum - PC Gaming UK":"gaming","Sophie - Indie Games UK":"gaming","Rhys - Console & PS UK":"gaming",
+  "Max - Zocken & Reviews":"gaming","Finn - Retro & Indie DE":"gaming","Lena - Gaming & Streaming":"gaming",
+  // v2.14.0: Film & TV
+  "רון - קולנוע וטלוויזיה":"film","מאיה - סדרות ודרמה":"film","Yael - Documentary & Art":"film",
+  "Jasmine - Hollywood Insider":"film","Devon - Streaming & Binge":"film","Carlos - Horror & Sci-Fi":"film",
+  "Alfie - British Cinema":"film","Rosie - TV & Drama UK":"film","Ethan - Sci-Fi & Fantasy UK":"film",
+  "Lukas - Film & Serien":"film","Nina - Kino & Kritik":"film","Amir - Popkultur & Film":"film",
+  // v2.15.0: Finance
+  "גלעד - שוק ההון":"finance","שרון - קריפטו ובלוקצ'יין":"finance","Eran - Startups & VC":"finance",
+  "Marcus - Wall Street":"finance","Kayla - Crypto & DeFi":"finance","Derek - Personal Finance":"finance",
+  "Oliver - City Finance":"finance","Amara - Fintech UK":"finance","Rishi - UK Economy":"finance",
+  "Stefan - Börse & Finanzen":"finance","Julia - Krypto & Blockchain":"finance","Moritz - Wirtschaft & Geld":"finance",
+  // v2.15.0: Travel
+  "דניאל - טייל בעולם":"travel","ענת - טיולים משפחתיים":"travel","Ori - Digital Nomad IL":"travel",
+  "Megan - Wanderlust":"travel","Jordan - Budget Travel":"travel","Samantha - Luxury Travel":"travel",
+  "Chloe - Travel UK":"travel","Kwame - Adventure UK":"travel","Isla - Solo Travel UK":"travel",
+  "Annika - Reisen & Abenteuer":"travel","Tobias - Backpacking DE":"travel","Leonie - Fernweh & Reise":"travel",
+  // v2.15.0: Fitness
+  "יעל - כושר ואימונים":"fitness","אור - תזונה ובריאות":"fitness","Noga - Yoga & Mindfulness":"fitness",
+  "Tanya - Gym & Gains":"fitness","Darius - Run & Recovery":"fitness","Alicia - Wellness & Self-Care":"fitness",
+  "Phoebe - Fitness UK":"fitness","Caleb - Strength UK":"fitness","Fatima - Wellness UK":"fitness",
+  "Mia - Fitness & Sport":"fitness","Henrik - Training & Health":"fitness","Carla - Yoga & Achtsamkeit":"fitness",
+  // v2.15.0: Books
+  "נועם - ספרים וספרות":"books","רינת - חינוך וטכנולוגיה":"books","Tal - Philosophy & Ideas":"books",
+  "Harper - BookTok":"books","Elijah - Sci-Fi & Fantasy Reads":"books","Nina - Non-Fiction & Essays":"books",
+  "Matilda - Literary UK":"books","Aiden - EdTech UK":"books","Imogen - Poetry & Prose UK":"books",
+  "Johanna - Bücher & Lesen":"books","Florian - Bildung & Wissen":"books","Lina - Literatur & Kultur":"books",
+  // v2.15.0: Cars
+  "איתי - רכב וטכנולוגיה":"cars","מיכאל - חשמליות ו-EV":"cars","Lior - Car Tech IL":"cars",
+  "Brayden - Muscle & Horsepower":"cars","Courtney - EV & Green Drive":"cars","Jalen - Truck & Off-Road":"cars",
+  "George - Top Gear Fan":"cars","Harry - F1 & Motorsport UK":"cars","Zoe - Car Reviews UK":"cars",
+  "Nico - Autos & Tuning":"cars","Kai - Elektro & Mobilität":"cars","Timo - Oldtimer & Klassiker":"cars",
+  // v2.15.0: Pets
+  "שי - כלבים וחתולים":"pets","תהילה - אימוץ וחילוץ":"pets","Amit - Animals & Nature IL":"pets",
+  "Bella - Dog Mom":"pets","Miles - Exotic Pets":"pets","Savannah - Cat Lady Life":"pets",
+  "Lucy - Pet Life UK":"pets","Alfie - Vet & Advice UK":"pets","Ellie - Wildlife UK":"pets",
+  "Maren - Haustiere & Liebe":"pets","Jana - Tierrettung & Pflege":"pets","Felix - Hunde & Natur":"pets",
+  // v2.15.0: Science
+  "עמית - מדע וחלל":"science","הילה - ביוטק ורפואה":"science","Yonatan - AI & Research IL":"science",
+  "Maya - Space & Astro":"science","Theo - Climate & Earth":"science","Zane - Quantum & Physics":"science",
+  "Raj - Science UK":"science","Sienna - BioTech UK":"science","Owen - Science Explainer UK":"science",
+  "Nils - Forschung & Wissen":"science","Clara - Klima & Umwelt":"science","Luisa - Medizin & Forschung":"science"
+};
+const VERTICAL_META = {
+  "news":{"icon":"📰","label":"News & Politics","color":"#ef4444"},
+  "tech":{"icon":"💻","label":"Tech","color":"#6366f1"},
+  "sports":{"icon":"⚽","label":"Sports","color":"#10b981"},
+  "general":{"icon":"🌐","label":"Culture & Life","color":"#f59e0b"},
+  "fashion":{"icon":"👗","label":"Fashion","color":"#ec4899"},
+  "beauty":{"icon":"💄","label":"Beauty","color":"#f43f5e"},
+  "music":{"icon":"🎵","label":"Music","color":"#8b5cf6"},
+  "food":{"icon":"🍔","label":"Food & Restaurants","color":"#f97316"},
+  "gaming":{"icon":"🎮","label":"Gaming","color":"#22c55e"},
+  "film":{"icon":"🎬","label":"Film & TV","color":"#06b6d4"},
+  "finance":{"icon":"💰","label":"Finance & Crypto","color":"#eab308"},
+  "travel":{"icon":"✈️","label":"Travel","color":"#0ea5e9"},
+  "fitness":{"icon":"🏋️","label":"Fitness & Health","color":"#f43f5e"},
+  "books":{"icon":"📚","label":"Books & Education","color":"#8b5cf6"},
+  "cars":{"icon":"🚗","label":"Cars & Auto","color":"#64748b"},
+  "pets":{"icon":"🐾","label":"Pets & Animals","color":"#f97316"},
+  "science":{"icon":"🔬","label":"Science","color":"#14b8a6"}
+};
+
+const DOMAIN_COUNTRY = {
+  "www.ynet.co.il":"🇮🇱 Israel","www.walla.co.il":"🇮🇱 Israel","news.walla.co.il":"🇮🇱 Israel",
+  "rss.walla.co.il":"🇮🇱 Israel","www.mako.co.il":"🇮🇱 Israel","www.calcalist.co.il":"🇮🇱 Israel",
+  "www.bbc.co.uk":"🇬🇧 UK","www.bbc.com":"🇬🇧 UK","www.theguardian.com":"🇬🇧 UK",
+  "news.sky.com":"🇬🇧 UK","www.telegraph.co.uk":"🇬🇧 UK",
+  "techcrunch.com":"🇺🇸 USA","www.theverge.com":"🇺🇸 USA",
+  "arstechnica.com":"🇺🇸 USA","www.wired.com":"🇺🇸 USA",
+  "www.cnn.com":"🇺🇸 USA","www.nytimes.com":"🇺🇸 USA",
+  "www.espn.com":"🇺🇸 USA","www.space.com":"🇺🇸 USA",
+  "www.spiegel.de":"🇩🇪 Germany","spiegel.de":"🇩🇪 Germany",
+  "www.zeit.de":"🇩🇪 Germany","zeit.de":"🇩🇪 Germany",
+  "www.tagesschau.de":"🇩🇪 Germany","tagesschau.de":"🇩🇪 Germany",
+  "www.faz.net":"🇩🇪 Germany","faz.net":"🇩🇪 Germany",
+  "www.heise.de":"🇩🇪 Germany","heise.de":"🇩🇪 Germany",
+  "www.bild.de":"🇩🇪 Germany","bild.de":"🇩🇪 Germany",
+  "www.lemonde.fr":"🇫🇷 France","lemonde.fr":"🇫🇷 France",
+  "www.lefigaro.fr":"🇫🇷 France","lefigaro.fr":"🇫🇷 France",
+  "www.liberation.fr":"🇫🇷 France","liberation.fr":"🇫🇷 France",
+  "www.france24.com":"🇫🇷 France","france24.com":"🇫🇷 France",
+  "www.lequipe.fr":"🇫🇷 France","lequipe.fr":"🇫🇷 France",
+  "www.01net.com":"🇫🇷 France","01net.com":"🇫🇷 France",
+  "elpais.com":"🇪🇸 Spain","www.elpais.com":"🇪🇸 Spain",
+  "www.elmundo.es":"🇪🇸 Spain","elmundo.es":"🇪🇸 Spain",
+  "www.marca.com":"🇪🇸 Spain","marca.com":"🇪🇸 Spain",
+  "www.abc.es":"🇪🇸 Spain","abc.es":"🇪🇸 Spain",
+  "www.lavanguardia.com":"🇪🇸 Spain","lavanguardia.com":"🇪🇸 Spain",
+  "www.xataka.com":"🇪🇸 Spain","xataka.com":"🇪🇸 Spain",
+  "www.corriere.it":"🇮🇹 Italy","corriere.it":"🇮🇹 Italy",
+  "www.repubblica.it":"🇮🇹 Italy","repubblica.it":"🇮🇹 Italy",
+  "www.gazzetta.it":"🇮🇹 Italy","gazzetta.it":"🇮🇹 Italy",
+  "www.ansa.it":"🇮🇹 Italy","ansa.it":"🇮🇹 Italy",
+  "www.ilsole24ore.com":"🇮🇹 Italy","ilsole24ore.com":"🇮🇹 Italy",
+  "www.wired.it":"🇮🇹 Italy","wired.it":"🇮🇹 Italy",
+  "www1.folha.uol.com.br":"🇧🇷 Brazil","folha.uol.com.br":"🇧🇷 Brazil",
+  "g1.globo.com":"🇧🇷 Brazil",
+  "www.uol.com.br":"🇧🇷 Brazil","uol.com.br":"🇧🇷 Brazil",
+  "www.estadao.com.br":"🇧🇷 Brazil","estadao.com.br":"🇧🇷 Brazil",
+  "www.techtudo.com.br":"🇧🇷 Brazil","techtudo.com.br":"🇧🇷 Brazil",
+  "ge.globo.com":"🇧🇷 Brazil",
+  "www3.nhk.or.jp":"🇯🇵 Japan","nhk.or.jp":"🇯🇵 Japan",
+  "www.asahi.com":"🇯🇵 Japan","asahi.com":"🇯🇵 Japan",
+  "www.nikkei.com":"🇯🇵 Japan","nikkei.com":"🇯🇵 Japan",
+  "news.yahoo.co.jp":"🇯🇵 Japan",
+  "www.itmedia.co.jp":"🇯🇵 Japan","itmedia.co.jp":"🇯🇵 Japan",
+  "www.sankei.com":"🇯🇵 Japan","sankei.com":"🇯🇵 Japan",
+  "www.hurriyet.com.tr":"🇹🇷 Turkey","hurriyet.com.tr":"🇹🇷 Turkey",
+  "www.sabah.com.tr":"🇹🇷 Turkey","sabah.com.tr":"🇹🇷 Turkey",
+  "www.ntv.com.tr":"🇹🇷 Turkey","ntv.com.tr":"🇹🇷 Turkey",
+  "www.sozcu.com.tr":"🇹🇷 Turkey","sozcu.com.tr":"🇹🇷 Turkey",
+  "www.haberturk.com":"🇹🇷 Turkey","haberturk.com":"🇹🇷 Turkey",
+  "www.webtekno.com":"🇹🇷 Turkey","webtekno.com":"🇹🇷 Turkey",
+  "timesofindia.indiatimes.com":"🇮🇳 India",
+  "www.ndtv.com":"🇮🇳 India","ndtv.com":"🇮🇳 India",
+  "www.hindustantimes.com":"🇮🇳 India","hindustantimes.com":"🇮🇳 India",
+  "www.thehindu.com":"🇮🇳 India","thehindu.com":"🇮🇳 India",
+  "indianexpress.com":"🇮🇳 India","www.indianexpress.com":"🇮🇳 India",
+  "www.livemint.com":"🇮🇳 India","livemint.com":"🇮🇳 India",
+  // v2.14.0: Lifestyle domains
+  "wwd.com":"🇺🇸 USA","www.wwd.com":"🇺🇸 USA",
+  "fashionista.com":"🇺🇸 USA","www.fashionista.com":"🇺🇸 USA",
+  "www.elle.com":"🇺🇸 USA","elle.com":"🇺🇸 USA",
+  "www.allure.com":"🇺🇸 USA","allure.com":"🇺🇸 USA",
+  "www.byrdie.com":"🇺🇸 USA","byrdie.com":"🇺🇸 USA",
+  "www.newbeauty.com":"🇺🇸 USA","newbeauty.com":"🇺🇸 USA",
+  "www.spin.com":"🇺🇸 USA","spin.com":"🇺🇸 USA",
+  "stereogum.com":"🇺🇸 USA","www.stereogum.com":"🇺🇸 USA",
+  "pitchfork.com":"🇺🇸 USA","www.pitchfork.com":"🇺🇸 USA",
+  "glamourmagazine.co.uk":"🇬🇧 UK","www.glamourmagazine.co.uk":"🇬🇧 UK",
+  "vogue.co.uk":"🇬🇧 UK","www.vogue.co.uk":"🇬🇧 UK",
+  "stylist.co.uk":"🇬🇧 UK","www.stylist.co.uk":"🇬🇧 UK",
+  "beautybay.com":"🇬🇧 UK","www.beautybay.com":"🇬🇧 UK",
+  "www.cosmopolitan.com":"🇬🇧 UK","cosmopolitan.com":"🇬🇧 UK",
+  "refinery29.com":"🇬🇧 UK","www.refinery29.com":"🇬🇧 UK",
+  "www.nme.com":"🇬🇧 UK","nme.com":"🇬🇧 UK",
+  "clashmusic.com":"🇬🇧 UK","www.clashmusic.com":"🇬🇧 UK",
+  "diymagazine.com":"🇬🇧 UK","www.diymagazine.com":"🇬🇧 UK",
+  "vogue.de":"🇩🇪 Germany","www.vogue.de":"🇩🇪 Germany",
+  "elle.de":"🇩🇪 Germany","www.elle.de":"🇩🇪 Germany",
+  "glamour.de":"🇩🇪 Germany","www.glamour.de":"🇩🇪 Germany",
+  "freundin.de":"🇩🇪 Germany","www.freundin.de":"🇩🇪 Germany",
+  "cosmopolitan.de":"🇩🇪 Germany","www.cosmopolitan.de":"🇩🇪 Germany",
+  "brigitte.de":"🇩🇪 Germany","www.brigitte.de":"🇩🇪 Germany",
+  "musikexpress.de":"🇩🇪 Germany","www.musikexpress.de":"🇩🇪 Germany",
+  "laut.de":"🇩🇪 Germany","www.laut.de":"🇩🇪 Germany",
+  "rollingstone.de":"🇩🇪 Germany","www.rollingstone.de":"🇩🇪 Germany",
+  "xnet.ynet.co.il":"🇮🇱 Israel",
+  // v2.14.0: Food
+  "www.seriouseats.com":"🇺🇸 USA","www.bonappetit.com":"🇺🇸 USA","www.eater.com":"🇺🇸 USA",
+  "www.bbcgoodfood.com":"🇬🇧 UK","www.deliciousmagazine.co.uk":"🇬🇧 UK","www.timeout.com":"🇬🇧 UK",
+  "www.chefkoch.de":"🇩🇪 Germany","www.falstaff.de":"🇩🇪 Germany","www.essen-und-trinken.de":"🇩🇪 Germany",
+  // v2.14.0: Gaming
+  "www.ign.com":"🇺🇸 USA","kotaku.com":"🇺🇸 USA","www.polygon.com":"🇺🇸 USA",
+  "www.eurogamer.net":"🇬🇧 UK","www.rockpapershotgun.com":"🇬🇧 UK","www.pcgamesn.com":"🇬🇧 UK",
+  "www.gamestar.de":"🇩🇪 Germany","www.gamepro.de":"🇩🇪 Germany","www.spieletipps.de":"🇩🇪 Germany",
+  // v2.14.0: Film & TV
+  "variety.com":"🇺🇸 USA","deadline.com":"🇺🇸 USA","www.hollywoodreporter.com":"🇺🇸 USA",
+  "www.empireonline.com":"🇬🇧 UK","www.denofgeek.com":"🇬🇧 UK","www.digitalspy.com":"🇬🇧 UK",
+  "www.filmstarts.de":"🇩🇪 Germany","www.moviepilot.de":"🇩🇪 Germany","www.kino.de":"🇩🇪 Germany",
+  // v2.15.0: Finance
+  "www.cnbc.com":"🇺🇸 USA","www.marketwatch.com":"🇺🇸 USA","www.coindesk.com":"🇺🇸 USA",
+  "www.ft.com":"🇬🇧 UK","www.cityam.com":"🇬🇧 UK","www.thisismoney.co.uk":"🇬🇧 UK",
+  "www.finanzen.net":"🇩🇪 Germany","www.boerse-online.de":"🇩🇪 Germany","www.btc-echo.de":"🇩🇪 Germany",
+  // v2.15.0: Travel
+  "www.cntraveler.com":"🇺🇸 USA","www.lonelyplanet.com":"🇺🇸 USA","thepointsguy.com":"🇺🇸 USA",
+  "www.wanderlust.co.uk":"🇬🇧 UK","www.thetimes.co.uk":"🇬🇧 UK",
+  "www.reisereporter.de":"🇩🇪 Germany","www.geo.de":"🇩🇪 Germany","www.travelbook.de":"🇩🇪 Germany",
+  // v2.15.0: Fitness
+  "www.menshealth.com":"🇺🇸 USA","www.womenshealthmag.com":"🇺🇸 USA","www.runnersworld.com":"🇺🇸 USA",
+  "www.coachmag.co.uk":"🇬🇧 UK","www.bodyandsoul.com.au":"🇬🇧 UK","www.self.com":"🇺🇸 USA",
+  "www.fitforfun.de":"🇩🇪 Germany","www.menshealth.de":"🇩🇪 Germany","www.runnersworld.de":"🇩🇪 Germany",
+  // v2.15.0: Books
+  "lithub.com":"🇺🇸 USA","bookriot.com":"🇺🇸 USA","www.publishersweekly.com":"🇺🇸 USA",
+  "www.waterstones.com":"🇬🇧 UK","www.booktrust.org.uk":"🇬🇧 UK",
+  "www.literaturcafe.de":"🇩🇪 Germany","www.buchreport.de":"🇩🇪 Germany","www.perlentaucher.de":"🇩🇪 Germany",
+  // v2.15.0: Cars
+  "www.caranddriver.com":"🇺🇸 USA","www.motortrend.com":"🇺🇸 USA","electrek.co":"🇺🇸 USA",
+  "www.autocar.co.uk":"🇬🇧 UK","www.topgear.com":"🇬🇧 UK","www.carmagazine.co.uk":"🇬🇧 UK",
+  "www.auto-motor-und-sport.de":"🇩🇪 Germany","www.autobild.de":"🇩🇪 Germany","www.elektroauto-news.net":"🇩🇪 Germany",
+  // v2.15.0: Pets
+  "www.akc.org":"🇺🇸 USA","www.thedodo.com":"🇺🇸 USA","www.petmd.com":"🇺🇸 USA",
+  "www.battersea.org.uk":"🇬🇧 UK","www.yourdog.co.uk":"🇬🇧 UK","www.cats.org.uk":"🇬🇧 UK",
+  "www.ein-herz-fuer-tiere.de":"🇩🇪 Germany","www.zooplus.de":"🇩🇪 Germany","herz-fuer-tiere.de":"🇩🇪 Germany",
+  // v2.15.0: Science
+  "www.scientificamerican.com":"🇺🇸 USA","www.livescience.com":"🇺🇸 USA","phys.org":"🇺🇸 USA",
+  "www.newscientist.com":"🇬🇧 UK","www.nature.com":"🇬🇧 UK",
+  "www.spektrum.de":"🇩🇪 Germany","www.scinexx.de":"🇩🇪 Germany","www.wissenschaft.de":"🇩🇪 Germany"
+};
+
+function togglePersonas() {
+  const el = document.getElementById('personaCollapse');
+  const arrow = document.getElementById('personaToggle');
+  if (el.style.maxHeight === '0px') {
+    el.style.maxHeight = el.scrollHeight + 'px';
+    arrow.style.transform = 'rotate(0deg)';
+  } else {
+    el.style.maxHeight = '0px';
+    arrow.style.transform = 'rotate(-90deg)';
+  }
+}
+
+function getCountry(url) {
+  try {
+    const h = new URL(url).hostname;
+    if (DOMAIN_COUNTRY[h]) return DOMAIN_COUNTRY[h];
+    if (h.endsWith(".de") || h.endsWith(".at")) return "🇩🇪 Germany";
+    if (h.endsWith(".fr")) return "🇫🇷 France";
+    if (h.endsWith(".es")) return "🇪🇸 Spain";
+    if (h.endsWith(".it")) return "🇮🇹 Italy";
+    if (h.endsWith(".com.br") || h.endsWith(".org.br")) return "🇧🇷 Brazil";
+    if (h.endsWith(".jp") || h.endsWith(".co.jp") || h.endsWith(".or.jp")) return "🇯🇵 Japan";
+    if (h.endsWith(".com.tr") || h.endsWith(".org.tr")) return "🇹🇷 Turkey";
+    if (h.endsWith(".in") || h.endsWith(".co.in")) return "🇮🇳 India";
+    if (h.endsWith(".co.il")) return "🇮🇱 Israel";
+    if (h.endsWith(".co.uk")) return "🇬🇧 UK";
+    return "🌐 Other";
+  } catch { return "🌐 Other"; }
+}
+
+let allData = [];
+let currentFilter = "all";
+let filterPersona = null;
+let filterCountry = null;
+let filterVertical = null;
+let currentPage = 0;
+const PAGE_SIZE = 50;
+
+function timeAgo(ts) {
+  const d = Date.now() - new Date(ts).getTime();
+  const m = Math.floor(d/60000);
+  if (m < 1) return "just now";
+  if (m < 60) return m + "m ago";
+  const h = Math.floor(m/60);
+  if (h < 24) return h + "h ago";
+  return Math.floor(h/24) + "d ago";
+}
+
+async function fetchHealth() {
+  try {
+    const r = await fetch(BASE + "/functions/v1/ai-worker/health");
+    const d = await r.json();
+    document.getElementById("hVersion").textContent = "v" + (d.version||"?");
+    document.getElementById("hModel").textContent = d.model||"?";
+    document.getElementById("hBadge").className = "badge badge-ok";
+    document.getElementById("hBadge").textContent = "● Online";
+  } catch {
+    document.getElementById("hBadge").className = "badge badge-err";
+    document.getElementById("hBadge").textContent = "● Offline";
+  }
+}
+
+async function fetchCellophanes() {
+  try {
+    allData = [];
+    const BATCH = 1000;
+    let offset = 0;
+    while (true) {
+      const r = await fetch(BASE + "/rest/v1/cellophanes?id=like.ai_%25&order=timestamp.desc&limit=" + BATCH + "&offset=" + offset, {
+        headers: { apikey: ANON, Authorization: "Bearer " + ANON }
+      });
+      const batch = await r.json();
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      allData = allData.concat(batch);
+      if (batch.length < BATCH) break;
+      offset += BATCH;
+    }
+    currentPage = 0;
+    updateStats();
+    renderFeed();
+  } catch(e) {
+    allData = [];
+    updateStats();
+    renderFeed();
+  }
+}
+
+function updateStats() {
+  const total = allData.length;
+  const withMedia = allData.filter(c => c.media_url).length;
+  const pct = total > 0 ? Math.round(withMedia/total*100) : 0;
+  const imgs = allData.filter(c => c.media_type === "image").length;
+  const gifs = allData.filter(c => c.media_type === "gif").length;
+  const personas = {};
+  const countries = {};
+  allData.forEach(c => {
+    personas[c.author] = (personas[c.author]||0)+1;
+    const country = getCountry(c.url);
+    countries[country] = (countries[country]||0)+1;
+  });
+
+  document.getElementById("sTotal").textContent = total;
+  document.getElementById("sMedia").textContent = withMedia + " (" + pct + "%)";
+  document.getElementById("sMediaSub").textContent = imgs + " img / " + gifs + " gif";
+  document.getElementById("sPersonas").textContent = Object.keys(personas).length;
+  document.getElementById("sCountries").textContent = Object.keys(countries).length;
+  document.getElementById("sCountriesSub").textContent = Object.keys(countries).map(c => c.split(" ")[0]).join(" ");
+
+  // Country chips
+  const cChips = document.getElementById("countryChips");
+  cChips.innerHTML = "";
+  const allC = document.createElement("button");
+  allC.className = "country-chip" + (!filterCountry ? " active" : "");
+  allC.innerHTML = "🌍 All <span class='country-count'>" + total + "</span>";
+  allC.onclick = () => { filterCountry = null; filterVertical = null; currentFilter = "all"; currentPage = 0; resetFilterBtns(); updateStats(); renderFeed(); };
+  cChips.appendChild(allC);
+
+  Object.entries(countries).sort((a,b) => b[1]-a[1]).forEach(([name, count]) => {
+    const chip = document.createElement("button");
+    chip.className = "country-chip" + (filterCountry === name ? " active" : "");
+    chip.innerHTML = name + " <span class='country-count'>" + count + "</span>";
+    chip.onclick = () => {
+      filterCountry = filterCountry === name ? null : name;
+      filterPersona = null;
+      filterVertical = null;
+      currentPage = 0;
+      currentFilter = filterCountry ? "country" : "all";
+      resetFilterBtns();
+      updateStats();
+      renderFeed();
+    };
+    cChips.appendChild(chip);
+  });
+
+  // Persona chips — filtered by selected vertical
+  const pChips = document.getElementById("personaChips");
+  pChips.innerHTML = "";
+  const personaEntries = Object.entries(personas).sort((a,b) => b[1]-a[1]);
+  const filteredPersonas = filterVertical
+    ? personaEntries.filter(([name]) => (PVERTICAL[name]||"general") === filterVertical)
+    : personaEntries;
+
+  if (filterVertical && filteredPersonas.length > 0) {
+    const vMeta = VERTICAL_META[filterVertical]||{icon:"📌",label:filterVertical};
+    const label = document.createElement("span");
+    label.style.cssText = "font-size:11px;color:#94a3b8;font-weight:600;padding:6px 0";
+    label.textContent = vMeta.icon + " " + filteredPersonas.length + " personas in " + vMeta.label;
+    pChips.appendChild(label);
+  }
+
+  filteredPersonas.forEach(([name, count]) => {
+    const col = PCOL[name]||"#64748b";
+    const emo = PEMO[name]||"💬";
+    const avatarUrl = PAVATAR[name];
+    const chipAvatar = avatarUrl
+      ? "<img src='" + avatarUrl + "' style='width:22px;height:22px;border-radius:6px' onerror=\"this.style.display='none'\" />"
+      : "<span>" + emo + "</span>";
+    const chip = document.createElement("button");
+    const pVert = PVERTICAL[name]||"general";
+    const pVertMeta = VERTICAL_META[pVert]||{color:"#64748b"};
+    chip.className = "persona-chip" + (filterPersona === name ? " active" : "");
+    chip.style.borderLeft = "3px solid " + pVertMeta.color;
+    chip.innerHTML = chipAvatar + "<span style='font-weight:600'>" + name + "</span><span class='persona-count' style='background:" + col + "18;color:" + col + "'>" + count + "</span>";
+    chip.onclick = () => {
+      filterPersona = filterPersona === name ? null : name;
+      filterCountry = null;
+      currentPage = 0;
+      currentFilter = filterPersona ? "persona" : (filterVertical ? "vertical" : "all");
+      resetFilterBtns();
+      updateStats();
+      renderFeed();
+    };
+    pChips.appendChild(chip);
+  });
+
+  // Vertical chips
+  const verticals = {};
+  allData.forEach(c => {
+    const v = PVERTICAL[c.author] || "general";
+    verticals[v] = (verticals[v]||0)+1;
+  });
+  const vChips = document.getElementById("verticalChips");
+  vChips.innerHTML = "";
+  const allV = document.createElement("button");
+  allV.className = "country-chip" + (!filterVertical ? " active" : "");
+  allV.innerHTML = "🌐 All <span class='country-count'>" + total + "</span>";
+  allV.onclick = () => { filterVertical = null; filterPersona = null; currentFilter = "all"; currentPage = 0; resetFilterBtns(); updateStats(); renderFeed(); };
+  vChips.appendChild(allV);
+
+  Object.entries(verticals).sort((a,b) => b[1]-a[1]).forEach(([vKey, count]) => {
+    const meta = VERTICAL_META[vKey] || {icon:"📌",label:vKey,color:"#64748b"};
+    const chip = document.createElement("button");
+    chip.className = "country-chip" + (filterVertical === vKey ? " active" : "");
+    chip.innerHTML = meta.icon + " " + meta.label + " <span class='country-count'>" + count + "</span>";
+    chip.onclick = () => {
+      filterVertical = filterVertical === vKey ? null : vKey;
+      filterPersona = null;
+      filterCountry = null;
+      currentPage = 0;
+      currentFilter = filterVertical ? "vertical" : "all";
+      resetFilterBtns();
+      updateStats();
+      renderFeed();
+    };
+    vChips.appendChild(chip);
+  });
+}
+
+function resetFilterBtns() {
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  if (!filterPersona && !filterCountry && currentFilter === "all") {
+    document.querySelector('[data-filter="all"]').classList.add("active");
+  } else if (currentFilter === "media") {
+    document.querySelector('[data-filter="media"]').classList.add("active");
+  }
+}
+
+function renderFeed() {
+  let filtered = allData;
+  if (currentFilter === "media") filtered = allData.filter(c => c.media_url);
+  else if (currentFilter === "persona" && filterPersona) filtered = allData.filter(c => c.author === filterPersona);
+  else if (currentFilter === "country" && filterCountry) filtered = allData.filter(c => getCountry(c.url) === filterCountry);
+  else if (currentFilter === "vertical" && filterVertical) filtered = allData.filter(c => (PVERTICAL[c.author]||"general") === filterVertical);
+
+  const totalFiltered = filtered.length;
+  const totalPages = Math.ceil(totalFiltered / PAGE_SIZE);
+  if (currentPage >= totalPages) currentPage = Math.max(0, totalPages - 1);
+  const start = currentPage * PAGE_SIZE;
+  const end = Math.min(start + PAGE_SIZE, totalFiltered);
+  const pageData = filtered.slice(start, end);
+
+  document.getElementById("filterCount").textContent = totalFiltered + " results";
+
+  const feed = document.getElementById("feed");
+  if (pageData.length === 0) {
+    feed.innerHTML = '<div class="empty">No AI cellophanes found</div>';
+    renderPagination(totalFiltered, totalPages);
+    return;
+  }
+
+  feed.innerHTML = pageData.map(c => {
+    const col = PCOL[c.author]||"#64748b";
+    const emo = PEMO[c.author]||"💬";
+    const avatarUrl = PAVATAR[c.author];
+    const avatarHtml = avatarUrl
+      ? "<img src='" + avatarUrl + "' style='width:100%;height:100%;border-radius:10px' onerror=\"this.style.display='none';this.parentElement.textContent='" + emo + "'\" />"
+      : emo;
+    const flag = getCountry(c.url).split(" ")[0];
+    const vKey = PVERTICAL[c.author]||"general";
+    const vMeta = VERTICAL_META[vKey]||{icon:"📌",label:vKey,color:"#64748b"};
+    const vertBadge = "<span class='cello-media-badge' style='background:" + vMeta.color + "15;color:" + vMeta.color + "'>" + vMeta.icon + " " + vMeta.label + "</span>";
+    const mediaBadge = c.media_type
+      ? "<span class='cello-media-badge " + (c.media_type==="gif"?"gif":"img") + "'>" + (c.media_type==="gif"?"🎬 GIF":"🖼️ IMG") + "</span>"
+      : "";
+    const mediaImg = c.media_url
+      ? "<div class='cello-img'><img src='" + c.media_url + "' onerror=\"this.parentElement.style.display='none'\" /></div>"
+      : "";
+    const px = c.position_x ? Math.round(c.position_x) : "?";
+    const py = c.position_y ? Math.round(c.position_y) : "?";
+    return "<div class='cello-card'><div class='cello-row'>" +
+      "<div class='cello-avatar' style='background:" + col + "12;border:2px solid " + col + "30'>" + avatarHtml + "</div>" +
+      "<div class='cello-body'>" +
+      "<div class='cello-meta'><span class='cello-author'>" + c.author + "</span><span class='cello-flag'>" + flag + "</span>" + vertBadge + mediaBadge + "<span class='cello-time'>" + timeAgo(c.timestamp) + "</span></div>" +
+      "<p class='cello-text' dir='auto'>" + (c.text||"") + "</p>" +
+      mediaImg +
+      "<div class='cello-footer'><a class='cello-url' href='" + c.url + "' target='_blank'>" + c.url + "</a><span class='cello-pos'>(" + px + ", " + py + ")</span></div>" +
+      "</div></div></div>";
+  }).join("");
+
+  renderPagination(totalFiltered, totalPages);
+}
+
+function renderPagination(totalFiltered, totalPages) {
+  let pag = document.getElementById("pagination");
+  if (!pag) {
+    pag = document.createElement("div");
+    pag.id = "pagination";
+    pag.style.cssText = "display:flex;justify-content:center;gap:8px;padding:20px 0;flex-wrap:wrap;align-items:center;";
+    document.getElementById("feed").after(pag);
+  }
+
+  if (totalPages <= 1) { pag.innerHTML = ""; return; }
+
+  let html = "";
+  for (let i = 0; i < totalPages; i++) {
+    const from = i * PAGE_SIZE + 1;
+    const to = Math.min((i + 1) * PAGE_SIZE, totalFiltered);
+    const active = i === currentPage;
+    html += "<button onclick='goToPage(" + i + ")' style='" +
+      "padding:8px 16px;border-radius:10px;border:1.5px solid " + (active ? "#6366f1" : "#e2e8f0") + ";" +
+      "background:" + (active ? "#eef2ff" : "#fff") + ";" +
+      "color:" + (active ? "#4338ca" : "#64748b") + ";" +
+      "font-weight:" + (active ? "700" : "500") + ";" +
+      "cursor:pointer;font-size:13px;transition:all .2s;" +
+      "'>" + from + "–" + to + "</button>";
+  }
+  pag.innerHTML = html;
+}
+
+function goToPage(page) {
+  currentPage = page;
+  renderFeed();
+  document.getElementById("feed").scrollIntoView({ behavior: "smooth" });
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  filterPersona = null;
+  filterCountry = null;
+  filterVertical = null;
+  currentPage = 0;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  updateStats();
+  renderFeed();
+}
+
+async function triggerCron() {
+  const box = document.getElementById("alertBox");
+  const txt = document.getElementById("alertText");
+  const det = document.getElementById("alertDetails");
+  box.className = "alert alert-warn";
+  box.style.display = "block";
+  txt.innerHTML = "<b>⏳ Cron triggered! Processing in background...</b>";
+  det.innerHTML = "<div style='color:#64748b'>Will auto-refresh in 30 seconds. You can also click Refresh manually.</div>";
+
+  // Fire and forget — don't await
+  fetch(BASE + "/functions/v1/ai-worker/cron", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: "Bearer " + WTOKEN }
+  }).then(r => r.json()).then(d => {
+    if (d.status === "ok") {
+      box.className = "alert alert-ok";
+      txt.innerHTML = "<b>✅ Cron complete:</b> " + d.posts_created + " created, " + d.posts_skipped + " skipped";
+      if (d.details) {
+        det.innerHTML = d.details.map(function(x) {
+          var avatarUrl = PAVATAR[x.persona];
+          var emo = PEMO[x.persona]||"💬";
+          var avatarTag = avatarUrl
+            ? "<img src='" + avatarUrl + "' style='width:18px;height:18px;border-radius:4px;vertical-align:middle;margin-right:4px' onerror=\"this.style.display='none'\" />"
+            : emo + " ";
+          var line = avatarTag + "<b>" + x.persona + "</b>: " + x.result;
+          if (x.body) line += " — <i>\"" + x.body.substring(0,70) + (x.body.length>70?"...":"") + "\"</i>";
+          if (x.media && x.media !== "none") line += " <span style='color:#7c3aed;font-weight:700'>[" + x.media + "]</span>";
+          return "<div>" + line + "</div>";
+        }).join("");
+      }
+      refreshAll();
+    } else if (d.status === "outside_active_hours") {
+      box.className = "alert alert-warn";
+      txt.innerHTML = "<b>⏰ Outside active hours</b> (9:00–22:00)";
+      det.innerHTML = "";
+    }
+  }).catch(() => {
+    // Timeout or network error — Worker is still running in background
+    box.className = "alert alert-ok";
+    txt.innerHTML = "<b>✅ Cron is running in background</b>";
+    det.innerHTML = "<div style='color:#64748b'>Worker is processing personas. Results will appear on refresh.</div>";
+  });
+
+  // Auto-refresh after 30 seconds
+  setTimeout(refreshAll, 30000);
+}
+
+async function refreshAll() {
+  document.getElementById("hTime").textContent = new Date().toLocaleTimeString("he-IL");
+  await Promise.all([fetchHealth(), fetchCellophanes()]);
+}
+
+setInterval(refreshAll, 60000);
+</script>
+</body>
+</html>
