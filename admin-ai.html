@@ -1539,6 +1539,13 @@ async function refreshAll() {
 }
 
 setInterval(refreshAll, 60000);
+
+// Expose functions used in onclick handlers (module scope fix)
+window.togglePersonas = togglePersonas;
+window.refreshAll = refreshAll;
+window.triggerCron = triggerCron;
+window.setFilter = setFilter;
+window.goToPage = goToPage;
 </script>
 </body>
 </html>
