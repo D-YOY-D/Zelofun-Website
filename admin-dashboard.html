@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zelofun™ Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+  }
+
+  /* === CARDS === */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .card {
+    background: linear-gradient(135deg, #1e293b 0%, #1a2332 100%);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent, #6366f1);
+  }
+  .card-icon { font-size: 28px; margin-bottom: 8px; }
+  .card-label { font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .card-value { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: #f1f5f9; }
+  .card-sub { font-size: 11px; color: #64748b; margin-top: 4px; }
+  .card-placeholder { color: #475569; font-size: 14px; font-style: italic; }
+
+  /* === SECTION === */
+  .section { margin-bottom: 28px; }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* === BAR CHART === */
+  .bar-chart { display: flex; flex-direction: column; gap: 8px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { width: 140px; font-size: 13px; color: #cbd5e1; text-align: right; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; height: 28px; background: #1e293b; border-radius: 6px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 600; color: white; min-width: 32px; transition: width 0.4s ease; }
+  .bar-count { font-size: 12px; color: #94a3b8; width: 50px; text-align: right; flex-shrink: 0; }
+
+  /* === TABLE === */
+  .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #334155; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead { background: #1e293b; }
+  th { padding: 12px 14px; text-align: left; color: #94a3b8; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 10px 14px; border-top: 1px solid #1e293b; color: #cbd5e1; }
+  tr:hover td { background: rgba(99,102,241,0.05); }
+  .text-col { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* === LAYOUT === */
+  .content { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
+  .header-bar {
+    background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 50%, #a855f7 100%);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.25);
+  }
+  .header-bar h1 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; color: white; }
+  .header-bar h1 span { color: #c4b5fd; }
+  .header-time { font-size: 13px; color: rgba(255,255,255,0.7); }
+  .btn { padding: 8px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-refresh { background: rgba(255,255,255,0.15); color: white; backdrop-filter: blur(4px); }
+  .btn-refresh:hover { background: rgba(255,255,255,0.25); }
+
+  .footer { margin-top: 40px; padding: 20px; text-align: center; color: #475569; font-size: 11px; }
+
+  @media (max-width: 600px) {
+    .cards { grid-template-columns: 1fr 1fr; }
+    .bar-label { width: 80px; font-size: 11px; }
+    .content { padding: 16px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== NAV BAR ========== -->
+<nav style="background:#1e293b;padding:12px 24px;display:flex;align-items:center;gap:24px;font-family:system-ui;position:sticky;top:0;z-index:1000;border-bottom:2px solid #6366f1">
+  <a href="admin.html" style="color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:6px;transition:all 0.2s">🛡️ Moderation</a>
+  <a href="admin-dashboard.html" style="background:#6366f1;color:white;text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:6px">📊 Dashboard</a>
+  <a href="admin-ai.html" style="color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:6px;transition:all 0.2s">🤖 AI Worker</a>
+  <a href="admin-analytics.html" style="color:#94a3b8;text-decoration:none;font-size:14px;font-weight:500;padding:6px 12px;border-radius:6px;transition:all 0.2s">📈 Analytics</a>
+  <div style="margin-left:auto;color:#475569;font-size:12px">Zelofun™ Admin</div>
+</nav>
+
+<!-- ========== AUTH SCREEN ========== -->
+<div id="auth-screen" style="display:flex;align-items:center;justify-content:center;min-height:80vh;flex-direction:column;gap:20px;font-family:system-ui;background:#0f172a;color:#e2e8f0">
+  <h1 style="font-size:28px">📊 Zelofun™ Dashboard</h1>
+  <p style="color:#94a3b8">Admin access only — authenticate with Google</p>
+  <button id="btn-login" style="padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:#6366f1;color:#fff">Sign in with Google</button>
+  <p id="auth-error" style="color:#f43f5e;display:none"></p>
+</div>
+
+<!-- ========== MAIN APP (hidden until auth) ========== -->
+<div id="app" style="display:none">
+<div class="header-bar">
+  <h1>📊 Zelofun™ <span>Dashboard</span></h1>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span class="header-time" id="hTime"></span>
+    <button class="btn btn-refresh" onclick="refreshAll()">↻ Refresh</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- ROW 1: Key Numbers -->
+  <div class="section">
+    <div class="section-title">Key Numbers</div>
+    <div class="cards">
+      <div class="card" style="--accent:#6366f1">
+        <div class="card-icon">📝</div>
+        <div class="card-label">Total Cellophanes</div>
+        <div class="card-value" id="totalPosts">—</div>
+      </div>
+      <div class="card" style="--accent:#0ea5e9">
+        <div class="card-icon">👤</div>
+        <div class="card-label">Total Users</div>
+        <div class="card-value" id="totalUsers">—</div>
+      </div>
+      <div class="card" style="--accent:#a855f7">
+        <div class="card-icon">🤖</div>
+        <div class="card-label">AI Posts</div>
+        <div class="card-value" id="aiPosts">—</div>
+      </div>
+      <div class="card" style="--accent:#10b981">
+        <div class="card-icon">🧑</div>
+        <div class="card-label">Human Posts</div>
+        <div class="card-value" id="humanPosts">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Today's Activity -->
+  <div class="section">
+    <div class="section-title">Today's Activity</div>
+    <div class="cards">
+      <div class="card" style="--accent:#f59e0b">
+        <div class="card-icon">📅</div>
+        <div class="card-label">Posts Today</div>
+        <div class="card-value" id="postsToday">—</div>
+      </div>
+      <div class="card" style="--accent:#ec4899">
+        <div class="card-icon">🤖</div>
+        <div class="card-label">AI Posts Today</div>
+        <div class="card-value" id="aiToday">—</div>
+      </div>
+      <div class="card" style="--accent:#64748b">
+        <div class="card-icon">👁️</div>
+        <div class="card-label">Feed Views Today</div>
+        <div class="card-placeholder">Coming Soon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Posts per Vertical -->
+  <div class="section">
+    <div class="section-title">Posts per Vertical</div>
+    <div class="bar-chart" id="verticalChart"><div style="color:#475569">Loading...</div></div>
+  </div>
+
+  <!-- ROW 4: Posts per Country -->
+  <div class="section">
+    <div class="section-title">Posts per Country</div>
+    <div class="bar-chart" id="countryChart"><div style="color:#475569">Loading...</div></div>
+  </div>
+
+  <!-- ROW 5: Recent Posts -->
+  <div class="section">
+    <div class="section-title">Recent Posts</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Time</th><th>Author</th><th>Vertical</th><th>Country</th><th>Text</th></tr></thead>
+        <tbody id="recentBody"><tr><td colspan="5" style="color:#475569;text-align:center">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Zelofun™ Dashboard • Auto-refresh every 60s</div>
+</div><!-- /app -->
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const BASE = "https://tlukysxlypmextjndyfl.supabase.co";
+const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsdWt5c3hseXBtZXh0am5keWZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2MzgyNjksImV4cCI6MjA3MjIxNDI2OX0.FMuY_YZ9ggh6h71JmqJAEOSL-LFwBI0zdG_tKjBCfSA";
+const ADMIN_EMAIL = 'nati@d-yo.com';
+
+const db = createClient(BASE, ANON);
+
+// ============================================================
+// AUTH
+// ============================================================
+async function checkAuth() {
+  const { data: { session } } = await db.auth.getSession();
+  if (session && session.user.email === ADMIN_EMAIL) {
+    showApp();
+  } else if (session) {
+    showAuthError('Access denied. Admin only.');
+    await db.auth.signOut();
+  }
+}
+
+document.getElementById('btn-login').addEventListener('click', async () => {
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+  if (error) showAuthError(error.message);
+});
+
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  refreshAll();
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+checkAuth();
+db.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session?.user?.email === ADMIN_EMAIL) showApp();
+});
+
+// ============================================================
+// HELPERS
+// ============================================================
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+const BAR_COLORS = ['#6366f1','#0ea5e9','#a855f7','#10b981','#f59e0b','#ec4899','#ef4444','#14b8a6','#f97316','#64748b','#8b5cf6','#dc2626','#06b6d4','#84cc16','#e879f9'];
+
+function renderBarChart(containerId, rows) {
+  const el = document.getElementById(containerId);
+  if (!rows || rows.length === 0) { el.innerHTML = '<div style="color:#475569">No data</div>'; return; }
+  const max = rows[0].cnt;
+  el.innerHTML = rows.map((r, i) => {
+    const pct = Math.max(3, (r.cnt / max) * 100);
+    const color = BAR_COLORS[i % BAR_COLORS.length];
+    const label = r.vertical || r.country || '—';
+    return `<div class="bar-row">
+      <div class="bar-label" title="${escHtml(label)}">${escHtml(label)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}">${r.cnt}</div></div>
+      <div class="bar-count">${r.cnt}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// DATA FETCHING
+// ============================================================
+async function fetchKeyNumbers() {
+  const [total, users, ai, human] = await Promise.all([
+    db.from('cellophanes').select('*', { count: 'exact', head: true }),
+    db.from('users').select('*', { count: 'exact', head: true }),
+    db.from('cellophanes').select('*', { count: 'exact', head: true }).like('id', 'ai_%'),
+    db.from('cellophanes').select('*', { count: 'exact', head: true }).not('id', 'like', 'ai_%'),
+  ]);
+  document.getElementById('totalPosts').textContent = (total.count ?? 0).toLocaleString();
+  document.getElementById('totalUsers').textContent = (users.count ?? 0).toLocaleString();
+  document.getElementById('aiPosts').textContent = (ai.count ?? 0).toLocaleString();
+  document.getElementById('humanPosts').textContent = (human.count ?? 0).toLocaleString();
+}
+
+async function fetchTodayActivity() {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const [posts, aiPosts] = await Promise.all([
+    db.from('cellophanes').select('*', { count: 'exact', head: true }).gte('created_at', since),
+    db.from('cellophanes').select('*', { count: 'exact', head: true }).like('id', 'ai_%').gte('created_at', since),
+  ]);
+  document.getElementById('postsToday').textContent = (posts.count ?? 0).toLocaleString();
+  document.getElementById('aiToday').textContent = (aiPosts.count ?? 0).toLocaleString();
+}
+
+async function fetchVerticalChart() {
+  const { data } = await db.rpc('get_vertical_counts');
+  if (data) {
+    renderBarChart('verticalChart', data);
+  } else {
+    // Fallback: fetch all and aggregate client-side
+    const { data: rows } = await db.from('cellophanes').select('vertical').not('vertical', 'is', null);
+    if (!rows) { document.getElementById('verticalChart').innerHTML = '<div style="color:#475569">No data</div>'; return; }
+    const counts = {};
+    rows.forEach(r => { counts[r.vertical] = (counts[r.vertical] || 0) + 1; });
+    const sorted = Object.entries(counts).map(([vertical, cnt]) => ({ vertical, cnt })).sort((a, b) => b.cnt - a.cnt);
+    renderBarChart('verticalChart', sorted);
+  }
+}
+
+async function fetchCountryChart() {
+  const { data } = await db.rpc('get_country_counts');
+  if (data) {
+    renderBarChart('countryChart', data);
+  } else {
+    const { data: rows } = await db.from('cellophanes').select('country').not('country', 'is', null);
+    if (!rows) { document.getElementById('countryChart').innerHTML = '<div style="color:#475569">No data</div>'; return; }
+    const counts = {};
+    rows.forEach(r => { counts[r.country] = (counts[r.country] || 0) + 1; });
+    const sorted = Object.entries(counts).map(([country, cnt]) => ({ country, cnt })).sort((a, b) => b.cnt - a.cnt);
+    renderBarChart('countryChart', sorted);
+  }
+}
+
+async function fetchRecentPosts() {
+  const { data } = await db.from('cellophanes').select('author, text, vertical, country, url, created_at').order('created_at', { ascending: false }).limit(10);
+  const tbody = document.getElementById('recentBody');
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="color:#475569;text-align:center">No posts yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(r => {
+    const time = new Date(r.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+    const text = r.text ? (r.text.length > 80 ? r.text.slice(0, 80) + '…' : r.text) : '—';
+    return `<tr>
+      <td style="white-space:nowrap">${escHtml(time)}</td>
+      <td>${escHtml(r.author || '—')}</td>
+      <td>${escHtml(r.vertical || '—')}</td>
+      <td>${escHtml(r.country || '—')}</td>
+      <td class="text-col" title="${escHtml(r.text || '')}">${escHtml(text)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// REFRESH
+// ============================================================
+async function refreshAll() {
+  document.getElementById('hTime').textContent = new Date().toLocaleTimeString('en-GB');
+  await Promise.all([
+    fetchKeyNumbers(),
+    fetchTodayActivity(),
+    fetchVerticalChart(),
+    fetchCountryChart(),
+    fetchRecentPosts(),
+  ]);
+}
+
+setInterval(refreshAll, 60000);
+
+// Expose for onclick
+window.refreshAll = refreshAll;
+</script>
+</body>
+</html>
