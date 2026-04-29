@@ -1,10 +1,11 @@
 /**
  * Zelofun - Shared Supabase Client
- * Version: 1.8.4
- * 
+ * Version: 1.8.12
+ *
  * Clean client for PWA (and future React Native).
  * Uses official Supabase JS library.
- * 
+ *
+ * UPDATE v1.8.12: AI persona avatar fallback via get_personas_by_ids RPC
  * UPDATE v1.8.4: Separate likes/dislikes counts, comment avatars + latest profile
  * UPDATE v1.8.3: Fetch comments_count and reactions_count with cellophanes
  * UPDATE v1.8.1: Fix author name - always use latest display_name from profile
@@ -221,7 +222,33 @@ async function addAvatarsToCellophanes(cellophanes) {
             };
         });
     }
-    
+
+    // v1.8.12: AI persona fallback. author_ids that did not match a human
+    // profile may belong to ai_layer.personas. Look those up via RPC and
+    // merge into the same profileMap. RPC failures degrade silently so the
+    // feed never breaks.
+    const missingIds = authorIds.filter(id => !profileMap[id]);
+    if (missingIds.length > 0) {
+        try {
+            const { data: personas, error: personasError } = await client
+                .rpc('get_personas_by_ids', { persona_ids: missingIds });
+            if (personasError) {
+                console.warn('[avatar] persona lookup failed:', personasError);
+            } else if (!Array.isArray(personas)) {
+                console.warn('[avatar] persona lookup: expected array, got:', typeof personas);
+            } else {
+                personas.forEach(p => {
+                    profileMap[p.id] = {
+                        avatar_url: p.avatar_url,
+                        display_name: p.display_name
+                    };
+                });
+            }
+        } catch (err) {
+            console.warn('[avatar] persona lookup threw:', err);
+        }
+    }
+
     // Count comments per cellophane
     const commentsCountMap = {};
     if (commentsResult.data) {

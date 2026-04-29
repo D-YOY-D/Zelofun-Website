@@ -1,8 +1,9 @@
 /**
  * Zelofun PWA - Main Application
- * Version: 1.8.11
+ * Version: 1.8.12
  *
  * CHANGELOG:
+ * v1.8.12 - AI persona avatars now render in feed and detail views (RPC fallback to ai_layer.personas)
  * v1.8.11 - SPA fallback (404.html) for /pwa/c/* deep links on GitHub Pages
  * v1.8.10 - Tech-debt cleanup: version drift fix, manifest version field, residual cellophane string, DEBUG-gated logs, CHANGELOG, README
  * v1.8.9 - Follow button in Detail Modal, Avatar fallback fix
@@ -265,7 +266,7 @@ function filterHiddenCellophanes(cellophanes) {
 // ===========================================
 
 async function initApp() {
-    log('🎬 Initializing Zelofun PWA v1.8.11...');
+    log('🎬 Initializing Zelofun PWA v1.8.12...');
     
     setupEventListeners();
     
