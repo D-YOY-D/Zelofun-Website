@@ -1338,4 +1338,4 @@ const CelloAPI = {
 // Make available globally
 window.CelloAPI = CelloAPI;
 
-console.log('✅ CelloAPI loaded - Shared Supabase Client v1.8.9');
+console.log('✅ CelloAPI loaded - Shared Supabase Client v1.8.12');
