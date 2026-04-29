@@ -1,8 +1,9 @@
 /**
  * Zelofun PWA - Main Application
- * Version: 1.8.10
+ * Version: 1.8.11
  *
  * CHANGELOG:
+ * v1.8.11 - SPA fallback (404.html) for /pwa/c/* deep links on GitHub Pages
  * v1.8.10 - Tech-debt cleanup: version drift fix, manifest version field, residual cellophane string, DEBUG-gated logs, CHANGELOG, README
  * v1.8.9 - Follow button in Detail Modal, Avatar fallback fix
  * v1.8.8 - Pull-to-refresh, Notifications, Gamification in Profile
@@ -264,7 +265,7 @@ function filterHiddenCellophanes(cellophanes) {
 // ===========================================
 
 async function initApp() {
-    log('🎬 Initializing Zelofun PWA v1.8.10...');
+    log('🎬 Initializing Zelofun PWA v1.8.11...');
     
     setupEventListeners();
     

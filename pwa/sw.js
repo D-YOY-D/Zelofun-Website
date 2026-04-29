@@ -1,17 +1,18 @@
 /**
  * Zelofun PWA Service Worker
- * Version: 1.8.10
+ * Version: 1.8.11
  *
  * Strategy: Network-first with selective caching
  * Only cache same-origin static assets (js/css/html/images)
  */
 
-const CACHE_NAME = 'zelofun-static-v1.8.10';
+const CACHE_NAME = 'zelofun-static-v1.8.11';
 
 // Static assets to precache on install
 const STATIC_ASSETS = [
     '/pwa/',
     '/pwa/index.html',
+    '/pwa/404.html',
     '/pwa/styles.css',
     '/pwa/app.js',
     '/pwa/manifest.json',
