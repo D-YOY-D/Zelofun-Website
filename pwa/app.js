@@ -1,8 +1,9 @@
 /**
  * Zelofun PWA - Main Application
- * Version: 1.8.9
- * 
+ * Version: 1.8.10
+ *
  * CHANGELOG:
+ * v1.8.10 - Tech-debt cleanup: version drift fix, manifest version field, residual cellophane string, DEBUG-gated logs, CHANGELOG, README
  * v1.8.9 - Follow button in Detail Modal, Avatar fallback fix
  * v1.8.8 - Pull-to-refresh, Notifications, Gamification in Profile
  * v1.8.7 - Browse Site tab with URL input, history, timeline + highlighted deep links
@@ -20,6 +21,9 @@
  * v1.2.0 - Fixed create cellophane with UUID + timestamp
  * v1.1.0 - Added avatar support via public_user_profiles join
  */
+
+const DEBUG = false;
+const log = (...args) => { if (DEBUG) console.log(...args); };
 
 // ===========================================
 // APP STATE
@@ -260,7 +264,7 @@ function filterHiddenCellophanes(cellophanes) {
 // ===========================================
 
 async function initApp() {
-    console.log('🎬 Initializing Zelofun PWA v1.8.8...');
+    log('🎬 Initializing Zelofun PWA v1.8.10...');
     
     setupEventListeners();
     
@@ -270,15 +274,15 @@ async function initApp() {
     const { data: { session } } = await CelloAPI.auth.getSession();
     
     if (session) {
-        console.log('✅ Found existing session');
+        log('✅ Found existing session');
         await handleAuthSuccess(session);
     } else {
-        console.log('👤 No session, showing login');
+        log('👤 No session, showing login');
         showScreen('login');
     }
     
     CelloAPI.auth.onAuthStateChange(async (event, session) => {
-        console.log('🔔 Auth event:', event);
+        log('🔔 Auth event:', event);
         
         if (event === 'SIGNED_IN' && session) {
             await handleAuthSuccess(session);
@@ -302,7 +306,7 @@ function checkForDeepLink() {
     
     if (match) {
         const cellophaneId = decodeURIComponent(match[1]);
-        console.log('🔗 Deep link detected:', cellophaneId);
+        log('🔗 Deep link detected:', cellophaneId);
         AppState.pendingDeepLink = cellophaneId;
     }
 }
@@ -317,7 +321,7 @@ async function handlePendingDeepLink() {
     const cellophaneId = AppState.pendingDeepLink;
     AppState.pendingDeepLink = null;
     
-    console.log('🔗 Processing deep link:', cellophaneId);
+    log('🔗 Processing deep link:', cellophaneId);
     
     // Fetch the cellophane
     const { data, error } = await CelloAPI.cellophanes.getById(cellophaneId);
@@ -520,7 +524,7 @@ function setupEventListeners() {
 // ===========================================
 
 async function handleGoogleLogin() {
-    console.log('🔐 Starting Google login...');
+    log('🔐 Starting Google login...');
     DOM.btnGoogleLogin.disabled = true;
     DOM.btnGoogleLogin.innerHTML = '<span class="spinner" style="width:20px;height:20px;border-width:2px;"></span> Signing in...';
     
@@ -540,7 +544,7 @@ async function handleAuthSuccess(session) {
     const { data: { user } } = await CelloAPI.auth.getUser();
     AppState.user = user;
     
-    console.log('👤 User:', user.email);
+    log('👤 User:', user.email);
     
     // v1.8.1: Also fetch profile from DB to get avatar
     let dbAvatarUrl = null;
@@ -548,7 +552,7 @@ async function handleAuthSuccess(session) {
         const { data: profile } = await CelloAPI.profile.getById(user.id);
         if (profile?.avatar_url) {
             dbAvatarUrl = profile.avatar_url;
-            console.log('📷 Got avatar from DB:', dbAvatarUrl);
+            log('📷 Got avatar from DB:', dbAvatarUrl);
         }
     } catch (e) {
         console.warn('⚠️ Could not fetch profile for avatar');
@@ -680,12 +684,12 @@ async function loadMyFeed(reset = false) {
         return;
     }
     
-    console.log('📦 Loaded cellophanes:', data);
+    log('📦 Loaded cellophanes:', data);
     
     // Debug: Check if avatar fields exist
     if (data.length > 0) {
-        console.log('🔍 First cellophane fields:', Object.keys(data[0]));
-        console.log('🖼️ Avatar fields:', {
+        log('🔍 First cellophane fields:', Object.keys(data[0]));
+        log('🖼️ Avatar fields:', {
             authorAvatar: data[0].authorAvatar,
             author_avatar: data[0].author_avatar
         });
@@ -811,7 +815,7 @@ function createCellophaneCard(cellophane) {
                         ${Icons[visibilityConfig.icon]}
                         ${visibilityConfig.label}
                     </span>
-                    <button class="btn-dismiss" data-id="${cellophane.id}" title="Hide this cellophane">
+                    <button class="btn-dismiss" data-id="${cellophane.id}" title="Hide this Zelofun">
                         ${Icons.x}
                     </button>
                 </div>
@@ -912,7 +916,7 @@ function renderMedia(cellophane) {
     
     if (!mediaUrl) return '';
     
-    console.log('🖼️ Media:', mediaType, mediaUrl);
+    log('🖼️ Media:', mediaType, mediaUrl);
     
     // IMAGE - use data attribute instead of inline onclick
     if (mediaType === 'image' || isImageUrl(mediaUrl)) {
@@ -1011,7 +1015,7 @@ window.openImageFullscreen = openImageFullscreen;
  * v1.8.4: Unified reaction handler for 👍 and 👎
  */
 async function handleReaction(cellophaneId, emoji, type) {
-    console.log(`${emoji} Toggling ${type} for:`, cellophaneId);
+    log(`${emoji} Toggling ${type} for:`, cellophaneId);
     
     const { data, error } = await CelloAPI.reactions.toggle(cellophaneId, emoji);
     
@@ -1021,7 +1025,7 @@ async function handleReaction(cellophaneId, emoji, type) {
         return;
     }
     
-    console.log(`${emoji} ${type} result:`, data);
+    log(`${emoji} ${type} result:`, data);
     
     // Update button state
     const btnClass = type === 'like' ? '.btn-like' : '.btn-dislike';
@@ -1148,7 +1152,7 @@ async function openCellophaneDetail(cellophane) {
     const authorName = cellophane.author || 'Anonymous';
     // v1.8.9: Ensure authorId is a valid string
     const authorId = cellophane.author_id || '';
-    console.log('📝 Detail opened for cellophane:', cellophane.id, 'authorId:', authorId);
+    log('📝 Detail opened for cellophane:', cellophane.id, 'authorId:', authorId);
     
     // Support both camelCase and snake_case from DB - sanitize URL
     const rawAvatar = cellophane.authorAvatar || cellophane.author_avatar || '';
@@ -1251,14 +1255,14 @@ async function openCellophaneDetail(cellophane) {
 function setupDetailModalEvents() {
     // Click on avatar/name to open profile
     const clickables = DOM.detailCellophane.querySelectorAll('[data-author-id]');
-    console.log('🔍 Found clickable elements:', clickables.length);
+    log('🔍 Found clickable elements:', clickables.length);
     
     clickables.forEach(el => {
         el.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             const authorId = el.dataset.authorId;
-            console.log('👤 Avatar clicked, authorId:', authorId);
+            log('👤 Avatar clicked, authorId:', authorId);
             
             // v1.8.9: Only open profile if authorId is valid
             if (authorId && authorId !== 'undefined' && authorId !== 'null' && authorId.length > 0) {
@@ -1999,7 +2003,7 @@ async function openProfileModal(userId) {
         return;
     }
     
-    console.log('👤 Opening profile for:', userId);
+    log('👤 Opening profile for:', userId);
     
     // Determine if viewing self
     const isSelf = AppState.user && AppState.user.id === userId;
@@ -2508,7 +2512,7 @@ function handleFileSelect(event, mediaType) {
     const file = event.target.files[0];
     if (!file) return;
     
-    console.log(`📎 Selected ${mediaType}:`, file.name);
+    log(`📎 Selected ${mediaType}:`, file.name);
     
     // Store file reference
     AppState.pendingMedia = {
@@ -2566,7 +2570,7 @@ function clearMediaPreview() {
 
 async function startAudioRecording() {
     try {
-        console.log('🎤 Starting audio recording...');
+        log('🎤 Starting audio recording...');
         
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const mediaRecorder = new MediaRecorder(stream);
@@ -2625,7 +2629,7 @@ async function startAudioRecording() {
 }
 
 function stopAudioRecording() {
-    console.log('🛑 Stopping audio recording...');
+    log('🛑 Stopping audio recording...');
     
     if (AppState.audioRecording.mediaRecorder && 
         AppState.audioRecording.mediaRecorder.state === 'recording') {
@@ -2638,7 +2642,7 @@ async function uploadPendingMedia() {
         return { url: null, type: null };
     }
     
-    console.log('📤 Uploading media...');
+    log('📤 Uploading media...');
     showToast('Uploading media...', 'info');
     
     const { url, error } = await CelloAPI.media.uploadFile(
@@ -2661,7 +2665,7 @@ async function uploadPendingMedia() {
 
 function handleAddToPage() {
     const url = DOM.btnAddToPage.dataset.url;
-    console.log('📝 Add to page:', url);
+    log('📝 Add to page:', url);
     
     // Close detail modal
     closeAllModals();
@@ -2673,8 +2677,8 @@ function handleAddToPage() {
 }
 
 function openCreateModal(prefillUrl = null) {
-    console.log('📝 Opening create modal');
-    console.log('📝 DOM.modalCreate:', DOM.modalCreate);
+    log('📝 Opening create modal');
+    log('📝 DOM.modalCreate:', DOM.modalCreate);
     
     if (!DOM.modalCreate) {
         console.error('❌ modalCreate element not found!');
@@ -2769,7 +2773,7 @@ async function handleCreateSubmit(e) {
         mediaType = uploaded.type;
     }
     
-    console.log('📝 Creating cellophane:', { text, visibility, url, mediaUrl, mediaType });
+    log('📝 Creating cellophane:', { text, visibility, url, mediaUrl, mediaType });
     
     const { data, error } = await CelloAPI.cellophanes.create({
         text,
@@ -2791,7 +2795,7 @@ async function handleCreateSubmit(e) {
         return;
     }
     
-    console.log('✅ Created cellophane:', data);
+    log('✅ Created cellophane:', data);
     showToast('Post created! 🎉', 'success');
     
     // Clear media preview
@@ -2810,9 +2814,9 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
         try {
             const registration = await navigator.serviceWorker.register('sw.js');
-            console.log('✅ Service Worker registered:', registration.scope);
+            log('✅ Service Worker registered:', registration.scope);
         } catch (error) {
-            console.log('❌ Service Worker registration failed:', error);
+            log('❌ Service Worker registration failed:', error);
         }
     });
 }

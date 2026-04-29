@@ -1,5 +1,6 @@
 {
     "name": "Zelofun",
+    "version": "1.8.10",
     "short_name": "Zelofun",
     "description": "Voice Yourself Anywhere",
     "start_url": "/pwa/",
