@@ -1,8 +1,9 @@
 /**
  * Zelofun PWA - Main Application
- * Version: 1.8.14
+ * Version: 1.8.15
  *
  * CHANGELOG:
+ * v1.8.15 - UI redesign: Card header layout — Follow text label restored, visibility badge moved to meta row, ellipsis on long names
  * v1.8.14 - UI fix: Compact icon-only Follow button on cards (was too large, broke card header layout). Visual size 28x28, hit zone 44x44.
  * v1.8.13 - Card-level Follow button + centralized Following state (one truth for all surfaces)
  * v1.8.12 - AI persona avatars now render in feed and detail views (RPC fallback to ai_layer.personas)
@@ -412,7 +413,7 @@ function filterHiddenCellophanes(cellophanes) {
 // ===========================================
 
 async function initApp() {
-    log('🎬 Initializing Zelofun PWA v1.8.14...');
+    log('🎬 Initializing Zelofun PWA v1.8.15...');
     
     setupEventListeners();
     
@@ -991,8 +992,8 @@ function createCellophaneCard(cellophane) {
                    ${followInflight ? 'disabled' : ''}
                    aria-label="${followIsActive ? 'Unfollow' : 'Follow'} ${escapeHtml(authorName)}"
                    title="${followIsActive ? 'Unfollow' : 'Follow'} ${escapeHtml(authorName)}">
-              <span class="btn-card-follow-icon" aria-hidden="true">${followIsActive ? '✓' : '+'}</span>
               <span class="btn-card-follow-label">${followIsActive ? 'Following' : 'Follow'}</span>
+              <span class="btn-card-follow-icon" aria-hidden="true">${followIsActive ? '✓' : ''}</span>
            </button>`
         : '';
 
@@ -1004,14 +1005,16 @@ function createCellophaneCard(cellophane) {
                     ${avatarHtml}
                     <div class="cellophane-author-info">
                         <div class="cellophane-author-name" data-author-id="${escapeHtml(authorId)}">${escapeHtml(authorName)}</div>
-                        <div class="cellophane-time">${timestamp}</div>
+                        <div class="cellophane-meta-row">
+                            <span class="cellophane-time">${timestamp}</span>
+                            <span class="visibility-badge ${visibility}">
+                                ${Icons[visibilityConfig.icon]}
+                                ${visibilityConfig.label}
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="cellophane-header-actions">
-                    <span class="visibility-badge ${visibility}">
-                        ${Icons[visibilityConfig.icon]}
-                        ${visibilityConfig.label}
-                    </span>
                     ${followBtnHtml}
                     <button class="btn-dismiss" data-id="${cellophane.id}" title="Hide this Zelofun">
                         ${Icons.x}
@@ -1097,7 +1100,7 @@ function createCellophaneCard(cellophane) {
                 followBtn.disabled = inflight;
                 const iconEl = followBtn.querySelector('.btn-card-follow-icon');
                 const labelEl = followBtn.querySelector('.btn-card-follow-label');
-                if (iconEl) iconEl.textContent = active ? '✓' : '+';
+                if (iconEl) iconEl.textContent = active ? '✓' : '';
                 if (labelEl) labelEl.textContent = active ? 'Following' : 'Follow';
                 const verb = active ? 'Unfollow' : 'Follow';
                 followBtn.setAttribute('aria-label', `${verb} ${authorName}`);

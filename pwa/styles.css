@@ -540,6 +540,8 @@ img {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
+    flex: 1;
+    min-width: 0;
 }
 
 /* Avatar with Gradient Fallback */
@@ -584,12 +586,16 @@ img {
 
 .cellophane-author-info {
     flex: 1;
+    min-width: 0;
 }
 
 .cellophane-author-name {
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .cellophane-time {
@@ -597,40 +603,44 @@ img {
     color: var(--color-text-secondary);
 }
 
-/* Visibility Badge with Gradient */
+/* v1.8.15: Second row of the card header — timestamp on the start,
+   visibility badge on the end. Sits inside .cellophane-author-info so it
+   spans the full width to the right of the avatar. */
+.cellophane-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    margin-top: 2px;
+}
+
+/* v1.8.15: Visibility badge — subtle inline tag (no gradient bg).
+   Per-visibility distinction is conveyed by tinting the SVG icon color
+   while the label text stays in the muted secondary color. */
 .visibility-badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 12px;
-    border-radius: var(--radius-full);
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: white;
+    padding: 0;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    flex-shrink: 0;
 }
 
 .visibility-badge svg {
     width: 12px;
     height: 12px;
+    opacity: 0.75;
 }
 
-.visibility-badge.public {
-    background: var(--color-public-gradient);
-}
-
-.visibility-badge.private {
-    background: var(--color-private-gradient);
-}
-
-.visibility-badge.groups {
-    background: var(--color-groups-gradient);
-}
-
-.visibility-badge.influencer {
-    background: var(--color-influencer-gradient);
-}
+.visibility-badge.public svg     { color: var(--color-public); }
+.visibility-badge.private svg    { color: var(--color-private); }
+.visibility-badge.groups svg     { color: var(--color-groups); }
+.visibility-badge.influencer svg { color: var(--color-influencer); }
 
 /* Card Content */
 .cellophane-content {
@@ -2400,44 +2410,41 @@ img {
     height: 16px;
 }
 
-/* v1.8.14: Compact icon-only Follow button on cards.
-   28x28 visual, 44x44 hit zone via the absolute ::before halo.
-   Glyph lives in .btn-card-follow-icon (set by JS); .btn-card-follow-label
-   is unconditionally hidden — the button is icon-only at every viewport. */
+/* v1.8.15: Compact text-pill Follow button.
+   Default state: "Follow" (label only, icon span is empty and collapses).
+   Following state: "Following ✓" (label + check icon).
+   44x44 hit zone preserved via the transparent ::before halo. */
 .btn-card-follow {
     position: relative;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
+    gap: 4px;
+    padding: 4px 10px;
+    min-height: 24px;
     border: 1px solid var(--color-primary);
     background: var(--color-primary);
     color: white;
-    border-radius: 50%;
-    font-size: 1rem;
-    font-weight: 700;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
     line-height: 1;
     cursor: pointer;
     transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
     flex-shrink: 0;
 }
 
-/* Tap-target expansion: invisible 8px halo so the hit zone is ~44x44
-   even though the visual is 28x28. */
 .btn-card-follow::before {
     content: '';
     position: absolute;
-    inset: -8px;
+    inset: -10px;
 }
 
 .btn-card-follow:hover {
-    transform: scale(1.08);
+    transform: scale(1.04);
 }
 
 .btn-card-follow:active {
-    transform: scale(0.95);
+    transform: scale(0.97);
 }
 
 .btn-card-follow:disabled {
@@ -2457,14 +2464,16 @@ img {
     line-height: 1;
 }
 
-/* Hide the label entirely — button is icon-only. */
-.btn-card-follow .btn-card-follow-label {
+/* When the icon span is empty (default "Follow" state) collapse it so
+   no visual gap appears next to the label. :empty matches an element
+   with NO children, including textContent === ''. */
+.btn-card-follow .btn-card-follow-icon:empty {
     display: none;
 }
 
 @keyframes btn-card-follow-pulse {
     0%, 100% { opacity: 0.55; }
-    50% { opacity: 0.85; }
+    50%      { opacity: 0.85; }
 }
 
 /* Toast with Undo */
