@@ -1,8 +1,9 @@
 /**
  * Zelofun PWA - Main Application
- * Version: 1.8.13
+ * Version: 1.8.14
  *
  * CHANGELOG:
+ * v1.8.14 - UI fix: Compact icon-only Follow button on cards (was too large, broke card header layout). Visual size 28x28, hit zone 44x44.
  * v1.8.13 - Card-level Follow button + centralized Following state (one truth for all surfaces)
  * v1.8.12 - AI persona avatars now render in feed and detail views (RPC fallback to ai_layer.personas)
  * v1.8.11 - SPA fallback (404.html) for /pwa/c/* deep links on GitHub Pages
@@ -411,7 +412,7 @@ function filterHiddenCellophanes(cellophanes) {
 // ===========================================
 
 async function initApp() {
-    log('🎬 Initializing Zelofun PWA v1.8.13...');
+    log('🎬 Initializing Zelofun PWA v1.8.14...');
     
     setupEventListeners();
     

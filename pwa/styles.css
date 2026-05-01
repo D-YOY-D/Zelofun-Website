@@ -2400,31 +2400,32 @@ img {
     height: 16px;
 }
 
-/* v1.8.13: Card-level Follow button — small pill that slots into
-   .cellophane-header-actions next to the visibility badge.
-   Tap target is expanded via an absolute ::before so the visual
-   stays compact (~28px tall) while remaining touch-friendly. */
+/* v1.8.14: Compact icon-only Follow button on cards.
+   28x28 visual, 44x44 hit zone via the absolute ::before halo.
+   Glyph lives in .btn-card-follow-icon (set by JS); .btn-card-follow-label
+   is unconditionally hidden — the button is icon-only at every viewport. */
 .btn-card-follow {
     position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 12px;
-    min-height: 28px;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
     border: 1px solid var(--color-primary);
     background: var(--color-primary);
     color: white;
-    border-radius: var(--radius-full);
-    font-size: 0.8rem;
-    font-weight: 600;
+    border-radius: 50%;
+    font-size: 1rem;
+    font-weight: 700;
     line-height: 1;
     cursor: pointer;
     transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
     flex-shrink: 0;
 }
 
-/* Tap-target expansion: invisible 8px halo around the button so the hit
-   zone clears the 44x44px guideline even though the visual is smaller. */
+/* Tap-target expansion: invisible 8px halo so the hit zone is ~44x44
+   even though the visual is 28x28. */
 .btn-card-follow::before {
     content: '';
     position: absolute;
@@ -2432,17 +2433,17 @@ img {
 }
 
 .btn-card-follow:hover {
-    transform: scale(1.04);
+    transform: scale(1.08);
 }
 
 .btn-card-follow:active {
-    transform: scale(0.97);
+    transform: scale(0.95);
 }
 
 .btn-card-follow:disabled {
-    opacity: 0.55;
     cursor: not-allowed;
     transform: none;
+    animation: btn-card-follow-pulse 1.2s ease-in-out infinite;
 }
 
 .btn-card-follow.is-following {
@@ -2456,14 +2457,14 @@ img {
     line-height: 1;
 }
 
-/* Narrow viewports: drop the label, keep just the +/check icon. */
-@media (max-width: 360px) {
-    .btn-card-follow .btn-card-follow-label {
-        display: none;
-    }
-    .btn-card-follow {
-        padding: 6px 9px;
-    }
+/* Hide the label entirely — button is icon-only. */
+.btn-card-follow .btn-card-follow-label {
+    display: none;
+}
+
+@keyframes btn-card-follow-pulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 0.85; }
 }
 
 /* Toast with Undo */
