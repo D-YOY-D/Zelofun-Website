@@ -1,10 +1,11 @@
 /**
  * Zelofun - Shared Supabase Client
- * Version: 1.8.12
+ * Version: 1.8.13
  *
  * Clean client for PWA (and future React Native).
  * Uses official Supabase JS library.
  *
+ * UPDATE v1.8.13: getMyFollowingIds() for centralized Follow state
  * UPDATE v1.8.12: AI persona avatar fallback via get_personas_by_ids RPC
  * UPDATE v1.8.4: Separate likes/dislikes counts, comment avatars + latest profile
  * UPDATE v1.8.3: Fetch comments_count and reactions_count with cellophanes
@@ -923,11 +924,32 @@ const CelloFollows = {
             .select('*', { count: 'exact', head: true })
             .eq('follower_id', userId);
         
-        return { 
-            followers: followers || 0, 
-            following: following || 0, 
-            error: e1 || e2 
+        return {
+            followers: followers || 0,
+            following: following || 0,
+            error: e1 || e2
         };
+    },
+
+    /**
+     * v1.8.13: Get the list of user IDs the current user follows.
+     * Used to seed the centralized Following state at login.
+     * Returns plain array of strings (any text id — real users or AI personas).
+     */
+    async getMyFollowingIds() {
+        const client = getClient();
+        if (!client) return { data: [], error: new Error('Client not initialized') };
+
+        const { data: { user } } = await client.auth.getUser();
+        if (!user) return { data: [], error: new Error('Not authenticated') };
+
+        const { data, error } = await client
+            .from('follows')
+            .select('following_id')
+            .eq('follower_id', user.id);
+
+        if (error) return { data: [], error };
+        return { data: (data || []).map(r => r.following_id).filter(Boolean), error: null };
     }
 };
 
@@ -1338,4 +1360,4 @@ const CelloAPI = {
 // Make available globally
 window.CelloAPI = CelloAPI;
 
-console.log('✅ CelloAPI loaded - Shared Supabase Client v1.8.12');
+console.log('✅ CelloAPI loaded - Shared Supabase Client v1.8.13');

@@ -2400,6 +2400,72 @@ img {
     height: 16px;
 }
 
+/* v1.8.13: Card-level Follow button — small pill that slots into
+   .cellophane-header-actions next to the visibility badge.
+   Tap target is expanded via an absolute ::before so the visual
+   stays compact (~28px tall) while remaining touch-friendly. */
+.btn-card-follow {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    min-height: 28px;
+    border: 1px solid var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+    flex-shrink: 0;
+}
+
+/* Tap-target expansion: invisible 8px halo around the button so the hit
+   zone clears the 44x44px guideline even though the visual is smaller. */
+.btn-card-follow::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+}
+
+.btn-card-follow:hover {
+    transform: scale(1.04);
+}
+
+.btn-card-follow:active {
+    transform: scale(0.97);
+}
+
+.btn-card-follow:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-card-follow.is-following {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border-color: var(--color-border);
+}
+
+.btn-card-follow .btn-card-follow-icon {
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Narrow viewports: drop the label, keep just the +/check icon. */
+@media (max-width: 360px) {
+    .btn-card-follow .btn-card-follow-label {
+        display: none;
+    }
+    .btn-card-follow {
+        padding: 6px 9px;
+    }
+}
+
 /* Toast with Undo */
 .toast-with-undo {
     display: flex;

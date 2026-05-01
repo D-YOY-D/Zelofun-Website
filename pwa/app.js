@@ -1,8 +1,9 @@
 /**
  * Zelofun PWA - Main Application
- * Version: 1.8.12
+ * Version: 1.8.13
  *
  * CHANGELOG:
+ * v1.8.13 - Card-level Follow button + centralized Following state (one truth for all surfaces)
  * v1.8.12 - AI persona avatars now render in feed and detail views (RPC fallback to ai_layer.personas)
  * v1.8.11 - SPA fallback (404.html) for /pwa/c/* deep links on GitHub Pages
  * v1.8.10 - Tech-debt cleanup: version drift fix, manifest version field, residual cellophane string, DEBUG-gated logs, CHANGELOG, README
@@ -77,6 +78,150 @@ const AppState = {
         chunks: [],
         startTime: null,
         timerInterval: null
+    },
+    // v1.8.13: Centralized Follow-state. Single source of truth for every
+    // Follow button across cards, Detail Modal, Profile Modal.
+    // ids       — Set of authorIds the current user follows (any text id).
+    // inflight  — Set of authorIds with a pending follow/unfollow API call.
+    // loaded    — true once getMyFollowingIds() has populated ids at login.
+    // subscribers — array of { userId, callback } pairs. notify(userId)
+    //               invokes each callback whose userId matches; callbacks
+    //               return false to self-unsubscribe (DOM node gone).
+    following: {
+        ids: new Set(),
+        inflight: new Set(),
+        loaded: false,
+        subscribers: []
+    }
+};
+
+// ===========================================
+// FOLLOWING — central registry (v1.8.13)
+// ===========================================
+//
+// Every Follow button (card, Detail Modal, Profile Modal) reads from
+// Following.has(userId) and writes through Following.toggle(userId, opts).
+// Subscribers re-render themselves on notify; gone-from-DOM nodes return
+// false from their callback and get pruned (self-healing, no manual
+// unsubscribe needed for cards).
+//
+// toggle modes:
+//   { optimistic: false } (default — used by cards)
+//     1. mark inflight, notify (button shows disabled)
+//     2. await API
+//     3. on success: mutate ids set, notify (button updates)
+//     4. on error: do not mutate, notify (button reverts to idle), toast
+//
+//   { optimistic: true } (used by modals — keeps existing snappy UX)
+//     1. mutate ids set immediately, mark inflight, notify
+//     2. await API
+//     3. on success: clear inflight, notify
+//     4. on error: revert ids set, clear inflight, notify, toast
+
+const Following = {
+    has(userId) {
+        return AppState.following.ids.has(userId);
+    },
+
+    isInflight(userId) {
+        return AppState.following.inflight.has(userId);
+    },
+
+    /**
+     * Subscribe to changes for a given userId. Callback is invoked on every
+     * notify() that matches userId, AND once after the initial state-load
+     * completes. Callback may return `false` to self-unsubscribe (used by
+     * card buttons to prune themselves once their DOM node is gone).
+     */
+    subscribe(userId, callback) {
+        const entry = { userId, callback };
+        AppState.following.subscribers.push(entry);
+        return () => {
+            const idx = AppState.following.subscribers.indexOf(entry);
+            if (idx >= 0) AppState.following.subscribers.splice(idx, 1);
+        };
+    },
+
+    notify(userId) {
+        const survivors = [];
+        for (const entry of AppState.following.subscribers) {
+            if (entry.userId !== userId) {
+                survivors.push(entry);
+                continue;
+            }
+            try {
+                const keep = entry.callback();
+                if (keep !== false) survivors.push(entry);
+            } catch (err) {
+                console.warn('[Following] subscriber threw:', err);
+            }
+        }
+        AppState.following.subscribers = survivors;
+    },
+
+    /**
+     * Notify every subscriber regardless of userId. Used after the initial
+     * getMyFollowingIds() fetch lands so already-rendered cards reflect
+     * server state.
+     */
+    notifyAll() {
+        const survivors = [];
+        for (const entry of AppState.following.subscribers) {
+            try {
+                const keep = entry.callback();
+                if (keep !== false) survivors.push(entry);
+            } catch (err) {
+                console.warn('[Following] subscriber threw:', err);
+            }
+        }
+        AppState.following.subscribers = survivors;
+    },
+
+    async toggle(userId, opts) {
+        const optimistic = !!(opts && opts.optimistic);
+
+        if (!userId) return { error: new Error('No userId') };
+        if (!AppState.user) return { error: new Error('Not authenticated') };
+        if (userId === AppState.user.id) return { error: new Error('Cannot follow self') };
+        if (AppState.following.inflight.has(userId)) {
+            return { error: new Error('Already in flight') };
+        }
+
+        const wasFollowing = AppState.following.ids.has(userId);
+        const willFollow = !wasFollowing;
+
+        AppState.following.inflight.add(userId);
+
+        if (optimistic) {
+            if (willFollow) AppState.following.ids.add(userId);
+            else AppState.following.ids.delete(userId);
+        }
+        Following.notify(userId);
+
+        const apiPromise = willFollow
+            ? CelloAPI.follows.follow(userId)
+            : CelloAPI.follows.unfollow(userId);
+        const { error } = await apiPromise;
+
+        AppState.following.inflight.delete(userId);
+
+        if (error) {
+            if (optimistic) {
+                // Revert
+                if (willFollow) AppState.following.ids.delete(userId);
+                else AppState.following.ids.add(userId);
+            }
+            Following.notify(userId);
+            showToast('Failed to update follow', 'error');
+            return { error };
+        }
+
+        if (!optimistic) {
+            if (willFollow) AppState.following.ids.add(userId);
+            else AppState.following.ids.delete(userId);
+        }
+        Following.notify(userId);
+        return { error: null };
     }
 };
 
@@ -266,7 +411,7 @@ function filterHiddenCellophanes(cellophanes) {
 // ===========================================
 
 async function initApp() {
-    log('🎬 Initializing Zelofun PWA v1.8.12...');
+    log('🎬 Initializing Zelofun PWA v1.8.13...');
     
     setupEventListeners();
     
@@ -584,14 +729,38 @@ async function handleAuthSuccess(session) {
     
     showScreen('main');
     await loadMyFeed(true);
-    
+
     // v1.8.8: Load notification count
     loadNotificationCount();
-    
+
+    // v1.8.13: Seed central Following state. Non-blocking — cards render
+    // immediately with default "Follow"; once this resolves, all already-
+    // rendered Follow buttons re-paint via Following.notifyAll().
+    loadMyFollowingIds();
+
     // v1.8.5: Handle pending deep link after auth
     await handlePendingDeepLink();
-    
+
     showToast(`Welcome, ${displayName}! 👋`, 'success');
+}
+
+/**
+ * v1.8.13: Fetch the list of authorIds the current user follows and
+ * seed AppState.following.ids. Best-effort; on failure leaves loaded=false
+ * and cards continue showing default "Follow" (the follow API is idempotent
+ * so a stray duplicate-follow click is a server-side no-op).
+ */
+async function loadMyFollowingIds() {
+    if (!AppState.user) return;
+    const { data, error } = await CelloAPI.follows.getMyFollowingIds();
+    if (error) {
+        console.warn('[Following] initial fetch failed:', error);
+        return;
+    }
+    AppState.following.ids = new Set(data || []);
+    AppState.following.loaded = true;
+    log('👥 Loaded following ids:', AppState.following.ids.size);
+    Following.notifyAll();
 }
 
 function handleAuthLogout() {
@@ -601,7 +770,13 @@ function handleAuthLogout() {
         my: { data: [], page: 0, hasMore: true, loading: false },
         following: { data: [], page: 0, hasMore: true, loading: false }
     };
-    
+    // v1.8.13: Reset central Follow state so a different user signing in
+    // afterwards doesn't see the previous user's follows.
+    AppState.following.ids = new Set();
+    AppState.following.inflight = new Set();
+    AppState.following.loaded = false;
+    AppState.following.subscribers = [];
+
     showScreen('login');
     showToast('Signed out successfully', 'success');
 }
@@ -796,11 +971,30 @@ function createCellophaneCard(cellophane) {
     
     // Avatar HTML - sanitized URL, delegated error handling (no inline onerror)
     // v1.8.0: Added data-author-id for profile click delegation
-    const avatarHtml = authorAvatar 
+    const avatarHtml = authorAvatar
         ? `<img src="${escapeHtml(authorAvatar)}" alt="${escapeHtml(authorName)}" class="cellophane-author-avatar avatar-with-fallback" data-author-id="${escapeHtml(authorId)}">
            <div class="avatar-fallback" style="display:none;" data-author-id="${escapeHtml(authorId)}">${initials}</div>`
         : `<div class="avatar-fallback" data-author-id="${escapeHtml(authorId)}">${initials}</div>`;
-    
+
+    // v1.8.13: Follow button — show on every card whose author is not self
+    // and only when logged in. Renders with current state from the central
+    // Following registry (default "Follow" if initial fetch hasn't landed).
+    const showFollowBtn = !!(AppState.user && authorId && authorId !== AppState.user.id);
+    const followIsActive = showFollowBtn && Following.has(authorId);
+    const followInflight = showFollowBtn && Following.isInflight(authorId);
+    const followBtnHtml = showFollowBtn
+        ? `<button class="btn-card-follow${followIsActive ? ' is-following' : ''}"
+                   type="button"
+                   data-user-id="${escapeHtml(authorId)}"
+                   data-following="${followIsActive}"
+                   ${followInflight ? 'disabled' : ''}
+                   aria-label="${followIsActive ? 'Unfollow' : 'Follow'} ${escapeHtml(authorName)}"
+                   title="${followIsActive ? 'Unfollow' : 'Follow'} ${escapeHtml(authorName)}">
+              <span class="btn-card-follow-icon" aria-hidden="true">${followIsActive ? '✓' : '+'}</span>
+              <span class="btn-card-follow-label">${followIsActive ? 'Following' : 'Follow'}</span>
+           </button>`
+        : '';
+
     card.innerHTML = `
         <div class="cellophane-gradient-strip"></div>
         <div class="cellophane-card-inner">
@@ -817,6 +1011,7 @@ function createCellophaneCard(cellophane) {
                         ${Icons[visibilityConfig.icon]}
                         ${visibilityConfig.label}
                     </span>
+                    ${followBtnHtml}
                     <button class="btn-dismiss" data-id="${cellophane.id}" title="Hide this Zelofun">
                         ${Icons.x}
                     </button>
@@ -880,9 +1075,38 @@ function createCellophaneCard(cellophane) {
         e.stopPropagation();
         handleDismiss(cellophane.id, card);
     });
-    
+
+    // v1.8.13: Card-level Follow button — pessimistic toggle + central-state
+    // subscription. Subscriber callback returns false once the button is
+    // detached from the document, which prunes it from the registry
+    // (self-healing — no manual unsubscribe needed when the feed is wiped).
+    if (showFollowBtn) {
+        const followBtn = card.querySelector('.btn-card-follow');
+        if (followBtn) {
+            followBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                Following.toggle(authorId, { optimistic: false });
+            });
+            Following.subscribe(authorId, () => {
+                if (!document.body.contains(followBtn)) return false;
+                const active = Following.has(authorId);
+                const inflight = Following.isInflight(authorId);
+                followBtn.dataset.following = String(active);
+                followBtn.classList.toggle('is-following', active);
+                followBtn.disabled = inflight;
+                const iconEl = followBtn.querySelector('.btn-card-follow-icon');
+                const labelEl = followBtn.querySelector('.btn-card-follow-label');
+                if (iconEl) iconEl.textContent = active ? '✓' : '+';
+                if (labelEl) labelEl.textContent = active ? 'Following' : 'Follow';
+                const verb = active ? 'Unfollow' : 'Follow';
+                followBtn.setAttribute('aria-label', `${verb} ${authorName}`);
+                followBtn.setAttribute('title', `${verb} ${authorName}`);
+            });
+        }
+    }
+
     card.addEventListener('click', () => openCellophaneDetail(cellophane));
-    
+
     return card;
 }
 
