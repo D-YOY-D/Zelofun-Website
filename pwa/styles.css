@@ -529,19 +529,32 @@ img {
 }
 
 /* Card Header */
+/* v1.8.17: 3-column × 2-row grid for the feed card header.
+   Column 1 (auto): avatar wrapper, spans both rows.
+   Column 2 (minmax(0, 1fr)): author name on row 1, timestamp on row 2.
+                             minmax(0, ...) lets the column shrink below
+                             content size so the ellipsis chain works.
+   Column 3 (auto): Follow + X on row 1, visibility badge on row 2.
+   Result: badge always aligns vertically under the X button regardless
+   of name length; timestamp never wraps to a second line. */
 .cellophane-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    column-gap: var(--spacing-sm);
+    row-gap: 2px;
+    align-items: center;
     margin-bottom: var(--spacing-sm);
 }
 
+/* v1.8.17: In the feed card the wrapper now contains only the avatar and
+   spans rows 1-2 of the grid. The Detail Modal still applies its own
+   inline `display: flex; …` to a same-named wrapper, which overrides the
+   `display: block` here — so this rule is feed-card-only in practice. */
 .cellophane-user {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    flex: 1;
-    min-width: 0;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    display: block;
 }
 
 /* Avatar with Gradient Fallback */
@@ -593,6 +606,11 @@ img {
 }
 
 .cellophane-author-name {
+    /* v1.8.17: grid placement — col 2, row 1, bottom-aligned so it sits
+       just above the timestamp. */
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--color-text);
@@ -602,29 +620,29 @@ img {
 }
 
 .cellophane-time {
+    /* v1.8.17: grid placement — col 2, row 2, top-aligned so it sits
+       just below the name. */
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
     font-size: 0.8rem;
     color: var(--color-text-secondary);
 }
 
-/* v1.8.15: Second row of the card header — timestamp on the start,
-   visibility badge on the end. Sits inside .cellophane-author-info so it
-   spans the full width to the right of the avatar.
-   v1.8.16 Bug 1: explicit width:100% — belt-and-suspenders against any
-   flex-context interpretation that would shrink the row to its content
-   size and prevent space-between from pushing the badge to the end. */
-.cellophane-meta-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-sm);
-    margin-top: 2px;
-    width: 100%;
-}
+/* v1.8.17: .cellophane-meta-row removed — replaced by direct grid
+   placement of timestamp and visibility-badge as children of
+   .cellophane-header. */
 
 /* v1.8.15: Visibility badge — subtle inline tag (no gradient bg).
    Per-visibility distinction is conveyed by tinting the SVG icon color
    while the label text stays in the muted secondary color. */
 .visibility-badge {
+    /* v1.8.17: grid placement — col 3, row 2, end-aligned so the badge
+       sits at the right edge of column 3, directly under the X button. */
+    grid-column: 3;
+    grid-row: 2;
+    justify-self: end;
+    align-self: start;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -2267,6 +2285,21 @@ img {
     text-decoration: underline;
 }
 
+/* v1.8.17: In the new grid feed-card layout the avatar wrapper and the
+   author name are siblings, not ancestor-descendant, so the rule above
+   no longer underlines the name when the avatar is hovered. :has()
+   restores that effect by reaching back up to .cellophane-header (the
+   common parent) and applying the hover state from there. The original
+   rule above is kept for the Detail Modal where the descendant
+   relationship still holds. Browsers without :has() (older Safari /
+   pre-2022 builds) silently fall back to direct-name hover only. */
+.cellophane-header:has(> .cellophane-user[data-author-id]:hover) > .cellophane-author-name[data-author-id],
+.cellophane-header:has(.cellophane-author-avatar[data-author-id]:hover) > .cellophane-author-name[data-author-id],
+.cellophane-header:has(.avatar-fallback[data-author-id]:hover) > .cellophane-author-name[data-author-id] {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
 /* ===========================================
    COMMENTS THREADING - v1.8.2
    =========================================== */
@@ -2387,6 +2420,11 @@ img {
    =========================================== */
 
 .cellophane-header-actions {
+    /* v1.8.17: grid placement — col 3, row 1, vertically centered.
+       Inner flex stays so Follow + X sit side-by-side. */
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
     display: flex;
     align-items: center;
     gap: 8px;

@@ -1,8 +1,9 @@
 /**
  * Zelofun PWA - Main Application
- * Version: 1.8.16
+ * Version: 1.8.17
  *
  * CHANGELOG:
+ * v1.8.17 - UI fix: Card header restructured with CSS Grid; PUBLIC badge aligns under the X button regardless of name length
  * v1.8.16 - 4 fixes: badge alignment, fullscreen idempotency, double-modal on media click, modal Follow centralized
  * v1.8.15 - UI redesign: Card header layout — Follow text label restored, visibility badge moved to meta row, ellipsis on long names
  * v1.8.14 - UI fix: Compact icon-only Follow button on cards (was too large, broke card header layout). Visual size 28x28, hit zone 44x44.
@@ -414,7 +415,7 @@ function filterHiddenCellophanes(cellophanes) {
 // ===========================================
 
 async function initApp() {
-    log('🎬 Initializing Zelofun PWA v1.8.16...');
+    log('🎬 Initializing Zelofun PWA v1.8.17...');
     
     setupEventListeners();
     
@@ -1004,23 +1005,19 @@ function createCellophaneCard(cellophane) {
             <div class="cellophane-header">
                 <div class="cellophane-user" data-author-id="${escapeHtml(authorId)}">
                     ${avatarHtml}
-                    <div class="cellophane-author-info">
-                        <div class="cellophane-author-name" data-author-id="${escapeHtml(authorId)}">${escapeHtml(authorName)}</div>
-                        <div class="cellophane-meta-row">
-                            <span class="cellophane-time">${timestamp}</span>
-                            <span class="visibility-badge ${visibility}">
-                                ${Icons[visibilityConfig.icon]}
-                                ${visibilityConfig.label}
-                            </span>
-                        </div>
-                    </div>
                 </div>
+                <div class="cellophane-author-name" data-author-id="${escapeHtml(authorId)}">${escapeHtml(authorName)}</div>
                 <div class="cellophane-header-actions">
                     ${followBtnHtml}
                     <button class="btn-dismiss" data-id="${cellophane.id}" title="Hide this Zelofun">
                         ${Icons.x}
                     </button>
                 </div>
+                <span class="cellophane-time">${timestamp}</span>
+                <span class="visibility-badge ${visibility}">
+                    ${Icons[visibilityConfig.icon]}
+                    ${visibilityConfig.label}
+                </span>
             </div>
             
             <div class="cellophane-content">${escapeHtml(cellophane.text || '')}</div>

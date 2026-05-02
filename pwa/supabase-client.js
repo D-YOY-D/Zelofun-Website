@@ -1,10 +1,11 @@
 /**
  * Zelofun - Shared Supabase Client
- * Version: 1.8.16
+ * Version: 1.8.17
  *
  * Clean client for PWA (and future React Native).
  * Uses official Supabase JS library.
  *
+ * UPDATE v1.8.17: (no-op for this client — version aligned with PWA shell)
  * UPDATE v1.8.16: (no-op for this client — version aligned with PWA shell)
  * UPDATE v1.8.15: (no-op for this client — version aligned with PWA shell)
  * UPDATE v1.8.14: (no-op for this client — version aligned with PWA shell)
@@ -1363,4 +1364,4 @@ const CelloAPI = {
 // Make available globally
 window.CelloAPI = CelloAPI;
 
-console.log('✅ CelloAPI loaded - Shared Supabase Client v1.8.16');
+console.log('✅ CelloAPI loaded - Shared Supabase Client v1.8.17');
