@@ -1,8 +1,9 @@
 /**
  * Zelofun PWA - Main Application
- * Version: 1.8.15
+ * Version: 1.8.16
  *
  * CHANGELOG:
+ * v1.8.16 - 4 fixes: badge alignment, fullscreen idempotency, double-modal on media click, modal Follow centralized
  * v1.8.15 - UI redesign: Card header layout — Follow text label restored, visibility badge moved to meta row, ellipsis on long names
  * v1.8.14 - UI fix: Compact icon-only Follow button on cards (was too large, broke card header layout). Visual size 28x28, hit zone 44x44.
  * v1.8.13 - Card-level Follow button + centralized Following state (one truth for all surfaces)
@@ -413,7 +414,7 @@ function filterHiddenCellophanes(cellophanes) {
 // ===========================================
 
 async function initApp() {
-    log('🎬 Initializing Zelofun PWA v1.8.15...');
+    log('🎬 Initializing Zelofun PWA v1.8.16...');
     
     setupEventListeners();
     
@@ -1109,7 +1110,15 @@ function createCellophaneCard(cellophane) {
         }
     }
 
-    card.addEventListener('click', () => openCellophaneDetail(cellophane));
+    // v1.8.16 Bug 3: Skip Detail Modal open when the click originated on
+    // a media element. The document-level handler (see setupEventListeners)
+    // catches `.media-clickable` and routes those clicks into the
+    // fullscreen viewer; without this guard, the card listener also fires
+    // and we end up with both modals stacked.
+    card.addEventListener('click', (e) => {
+        if (e.target.closest('.media-clickable')) return;
+        openCellophaneDetail(cellophane);
+    });
 
     return card;
 }
@@ -1209,24 +1218,31 @@ function isAudioUrl(url) {
 function openImageFullscreen(url) {
     const safeUrl = sanitizeUrl(url);
     if (!safeUrl) return;
-    
+
+    // v1.8.16 Bug 2: Idempotent — never let two fullscreen modals coexist.
+    // Without this, rapid double-taps or any race between create + remove
+    // could stack overlays in the DOM.
+    document.querySelectorAll('.image-fullscreen-modal').forEach(el => el.remove());
+
     const modal = document.createElement('div');
     modal.className = 'image-fullscreen-modal';
-    
+
     const backdrop = document.createElement('div');
     backdrop.className = 'image-fullscreen-backdrop';
     backdrop.addEventListener('click', () => modal.remove());
-    
+
     const img = document.createElement('img');
     img.className = 'image-fullscreen-img';
     img.src = safeUrl;
-    img.addEventListener('click', (e) => e.stopPropagation());
-    
+    // v1.8.16 Bug 2: Image click also closes — matches user expectation
+    // ("I'm done looking"). Was a no-op stopPropagation before.
+    img.addEventListener('click', () => modal.remove());
+
     const closeBtn = document.createElement('button');
     closeBtn.className = 'image-fullscreen-close';
     closeBtn.textContent = '✕';
     closeBtn.addEventListener('click', () => modal.remove());
-    
+
     modal.appendChild(backdrop);
     modal.appendChild(img);
     modal.appendChild(closeBtn);
@@ -1394,13 +1410,16 @@ async function openCellophaneDetail(cellophane) {
     // v1.8.9: Check if self to hide Follow button
     const isSelf = AppState.user && authorId && AppState.user.id === authorId;
     const showFollowBtn = AppState.user && authorId && !isSelf;
-    
-    // v1.8.9: Check follow status before rendering
-    let isFollowing = false;
-    if (showFollowBtn) {
-        const { data } = await CelloAPI.follows.isFollowing(authorId);
-        isFollowing = data;
-    }
+
+    // v1.8.16 Bug 4a: Read follow state from the central Following registry
+    // instead of awaiting a per-modal-open API call. Cards already populate
+    // the registry via loadMyFollowingIds() at login. If the registry hasn't
+    // loaded yet (e.g. deep link), we render "Follow" by default — the
+    // follow API is idempotent so a stale duplicate-follow click is a
+    // server-side no-op, and the subscriber callback corrects the UI when
+    // the registry catches up.
+    const isFollowing = showFollowBtn && Following.has(authorId);
+    const followInflight = showFollowBtn && Following.isInflight(authorId);
     
     // Avatar HTML - with data-author-id for click to open profile
     const avatarHtml = authorAvatar 
@@ -1409,8 +1428,9 @@ async function openCellophaneDetail(cellophane) {
         : `<div class="avatar-fallback detail-avatar-clickable" data-author-id="${escapeHtml(authorId)}" style="width:48px;height:48px;font-size:1.2rem;cursor:pointer;">${initials}</div>`;
     
     // v1.8.9: Follow button HTML - next to author name on the right
-    const followBtnHtml = showFollowBtn 
-        ? `<button id="btn-detail-follow" class="btn ${isFollowing ? 'btn-outline' : 'btn-primary'} btn-follow-small" data-user-id="${escapeHtml(authorId)}" data-following="${isFollowing}">
+    // v1.8.16 Bug 4a: Includes inflight-disabled state from registry.
+    const followBtnHtml = showFollowBtn
+        ? `<button id="btn-detail-follow" class="btn ${isFollowing ? 'btn-outline' : 'btn-primary'} btn-follow-small" data-user-id="${escapeHtml(authorId)}" data-following="${isFollowing}" ${followInflight ? 'disabled' : ''}>
                ${isFollowing ? 'Following' : 'Follow'}
            </button>`
         : '';
@@ -1505,39 +1525,37 @@ function setupDetailModalEvents() {
         });
     });
     
-    // Follow button click
+    // v1.8.16 Bug 4b: Follow button now writes through Following.toggle
+    // (optimistic mode for snappy modal UX) and reads back via subscribe.
+    // Cards subscribed to the same userId update automatically.
     const btnFollow = document.getElementById('btn-detail-follow');
     if (btnFollow) {
+        const userId = btnFollow.dataset.userId;
+
         btnFollow.addEventListener('click', async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
-            const userId = btnFollow.dataset.userId;
             if (!userId || !AppState.user) return;
-            
-            const wasFollowing = btnFollow.dataset.following === 'true';
-            
-            // Optimistic update
-            btnFollow.textContent = wasFollowing ? 'Follow' : 'Following';
-            btnFollow.classList.toggle('btn-outline', !wasFollowing);
-            btnFollow.classList.toggle('btn-primary', wasFollowing);
-            btnFollow.dataset.following = (!wasFollowing).toString();
-            
-            // Call correct API
-            const { error } = wasFollowing 
-                ? await CelloAPI.follows.unfollow(userId)
-                : await CelloAPI.follows.follow(userId);
-            
-            if (error) {
-                // Revert on error
-                btnFollow.textContent = wasFollowing ? 'Following' : 'Follow';
-                btnFollow.classList.toggle('btn-outline', wasFollowing);
-                btnFollow.classList.toggle('btn-primary', !wasFollowing);
-                btnFollow.dataset.following = wasFollowing.toString();
-                showToast('Failed to update follow', 'error');
-            } else {
-                showToast(wasFollowing ? 'Unfollowed' : 'Following!', 'success');
+            const result = await Following.toggle(userId, { optimistic: true });
+            // Toast on success only — Following.toggle already toasts on error.
+            if (!result.error) {
+                showToast(Following.has(userId) ? 'Following!' : 'Unfollowed', 'success');
             }
+        });
+
+        // Subscribe — re-renders this button on any Following state change
+        // for `userId`. Self-heals when the modal body is rebuilt or closed:
+        // `document.body.contains(btnFollow)` returns false → callback
+        // returns false → registry prunes the entry on next notify.
+        Following.subscribe(userId, () => {
+            if (!document.body.contains(btnFollow)) return false;
+            const active = Following.has(userId);
+            const flying = Following.isInflight(userId);
+            btnFollow.dataset.following = String(active);
+            btnFollow.disabled = flying;
+            btnFollow.textContent = active ? 'Following' : 'Follow';
+            btnFollow.classList.toggle('btn-outline', active);
+            btnFollow.classList.toggle('btn-primary', !active);
         });
     }
 }
@@ -2239,10 +2257,10 @@ async function openProfileModal(userId) {
     const isSelf = AppState.user && AppState.user.id === userId;
     
     // Reset profile state
+    // v1.8.16 Bug 4c: `isFollowing` removed — read from Following.has() instead.
     AppState.profile = {
         userId,
         isSelf,
-        isFollowing: false,
         currentTab: 'my',
         tabs: {
             my: { data: [], page: 0, hasMore: true, loading: false },
@@ -2270,12 +2288,11 @@ async function openProfileModal(userId) {
         
         const profile = profileResult.data;
         
-        // Check if current user is following this user (only if not self)
-        if (!isSelf && AppState.user) {
-            const { data: isFollowing } = await CelloAPI.follows.isFollowing(userId);
-            AppState.profile.isFollowing = isFollowing;
-        }
-        
+        // v1.8.16 Bug 4c: Skip the per-modal-open isFollowing API call —
+        // renderProfileHeader reads from Following.has() and subscribes for
+        // live updates. Cards have already populated the registry via
+        // loadMyFollowingIds() at login.
+
         // Update UI
         renderProfileHeader(profile, followCountsResult, isSelf);
         showProfileLoading(false);
@@ -2345,10 +2362,35 @@ function renderProfileHeader(profile, followCounts, isSelf) {
     if (DOM.statFollowing) DOM.statFollowing.textContent = followCounts.following || 0;
     
     // Follow button (hide for self)
+    // v1.8.16 Bug 4d: Read state from registry. Subscribe with closure-tracked
+    // `prevHas` so the followers count is adjusted ONLY on a state transition
+    // (not on every notify — which can fire twice per click: once at the start
+    // of inflight, once at completion). prevHas is updated immediately after
+    // the delta is applied so a subsequent notify with no further change is
+    // a no-op. Self-heals via the modal-active check.
     if (DOM.btnFollow) {
         DOM.btnFollow.classList.toggle('hidden', isSelf);
         DOM.btnFollow.dataset.userId = profile.id;
-        updateFollowButton(AppState.profile.isFollowing);
+        if (!isSelf) {
+            let prevHas = Following.has(profile.id);
+            updateFollowButton(prevHas);
+            Following.subscribe(profile.id, () => {
+                // Self-unsubscribe once Profile Modal is no longer open
+                if (!DOM.modalProfile.classList.contains('active')) return false;
+                const nowHas = Following.has(profile.id);
+                if (nowHas !== prevHas) {
+                    // State transition — adjust followers count by ±1
+                    const currentCount = parseInt(DOM.statFollowers?.textContent || '0', 10) || 0;
+                    if (DOM.statFollowers) {
+                        DOM.statFollowers.textContent = nowHas ? currentCount + 1 : currentCount - 1;
+                    }
+                    prevHas = nowHas;
+                }
+                updateFollowButton(nowHas);
+            });
+        } else {
+            updateFollowButton(false);
+        }
     }
     
     // Actions (show Sign Out only for self)
@@ -2359,10 +2401,11 @@ function renderProfileHeader(profile, followCounts, isSelf) {
 
 /**
  * Update follow button state
+ * v1.8.16 Bug 4e: Reflects inflight from the Following registry.
  */
 function updateFollowButton(isFollowing) {
     if (!DOM.btnFollow) return;
-    
+
     if (isFollowing) {
         DOM.btnFollow.textContent = 'Following';
         DOM.btnFollow.classList.remove('btn-primary');
@@ -2372,51 +2415,27 @@ function updateFollowButton(isFollowing) {
         DOM.btnFollow.classList.add('btn-primary');
         DOM.btnFollow.classList.remove('btn-outline');
     }
+
+    const userId = AppState.profile?.userId;
+    DOM.btnFollow.disabled = userId ? Following.isInflight(userId) : false;
 }
 
 /**
- * Toggle follow/unfollow
+ * Toggle follow/unfollow.
+ * v1.8.16 Bug 4f: Routes through Following.toggle (optimistic mode for
+ * snappy modal UX). The followers count + button state are updated by the
+ * subscriber registered in renderProfileHeader — single source of truth.
+ * Following.toggle handles the optimistic state mutation, error revert,
+ * and failure toast internally.
  */
 async function toggleFollow() {
     const userId = AppState.profile.userId;
     if (!userId || AppState.profile.isSelf) return;
-    
-    const wasFollowing = AppState.profile.isFollowing;
-    
-    // Optimistic update
-    AppState.profile.isFollowing = !wasFollowing;
-    updateFollowButton(!wasFollowing);
-    
-    // Update count optimistically
-    const currentCount = parseInt(DOM.statFollowers?.textContent || '0');
-    if (DOM.statFollowers) {
-        DOM.statFollowers.textContent = wasFollowing ? currentCount - 1 : currentCount + 1;
-    }
-    
-    try {
-        let error;
-        if (wasFollowing) {
-            const result = await CelloAPI.follows.unfollow(userId);
-            error = result.error;
-        } else {
-            const result = await CelloAPI.follows.follow(userId);
-            error = result.error;
-        }
-        
-        if (error) {
-            console.error('❌ Follow toggle failed:', error);
-            AppState.profile.isFollowing = wasFollowing;
-            updateFollowButton(wasFollowing);
-            if (DOM.statFollowers) DOM.statFollowers.textContent = currentCount;
-            showToast('Failed to update follow status', 'error');
-        } else {
-            showToast(wasFollowing ? 'Unfollowed' : 'Following!', 'success');
-        }
-    } catch (error) {
-        console.error('❌ Follow toggle error:', error);
-        AppState.profile.isFollowing = wasFollowing;
-        updateFollowButton(wasFollowing);
-        if (DOM.statFollowers) DOM.statFollowers.textContent = currentCount;
+
+    const wasFollowing = Following.has(userId);
+    const result = await Following.toggle(userId, { optimistic: true });
+    if (!result.error) {
+        showToast(wasFollowing ? 'Unfollowed' : 'Following!', 'success');
     }
 }
 

@@ -585,7 +585,10 @@ img {
 }
 
 .cellophane-author-info {
-    flex: 1;
+    /* v1.8.16 Bug 1: flex-basis `auto` lets the column resolve from its
+       content size rather than 0%, so the inner block-level meta-row
+       reliably fills the column's full width. */
+    flex: 1 1 auto;
     min-width: 0;
 }
 
@@ -605,13 +608,17 @@ img {
 
 /* v1.8.15: Second row of the card header — timestamp on the start,
    visibility badge on the end. Sits inside .cellophane-author-info so it
-   spans the full width to the right of the avatar. */
+   spans the full width to the right of the avatar.
+   v1.8.16 Bug 1: explicit width:100% — belt-and-suspenders against any
+   flex-context interpretation that would shrink the row to its content
+   size and prevent space-between from pushing the badge to the end. */
 .cellophane-meta-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-sm);
     margin-top: 2px;
+    width: 100%;
 }
 
 /* v1.8.15: Visibility badge — subtle inline tag (no gradient bg).
